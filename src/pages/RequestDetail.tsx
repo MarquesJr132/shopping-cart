@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
-import { Edit, FileText, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import { Edit, FileText, CheckCircle, XCircle, ArrowLeft, Calendar } from "lucide-react";
 import { getShoppingRequestById, updateShoppingRequest, canApprove, canManage, canGeneratePDF, type ShoppingRequestWithItems } from "@/lib/supabase";
 import jsPDF from 'jspdf';
 
@@ -66,7 +66,7 @@ export const RequestDetail = () => {
     };
 
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'secondary'} className="bg-red-500 text-white hover:bg-red-600">
+      <Badge variant={variants[status as keyof typeof variants] || 'secondary'} className="bg-red-500 text-white hover:bg-red-600 px-3 py-1">
         {labels[status as keyof typeof labels] || status}
       </Badge>
     );
@@ -276,18 +276,18 @@ export const RequestDetail = () => {
   const userCanGeneratePDF = canGeneratePDF(profile.role);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-6 py-8 max-w-7xl">`
+      <div className="container mx-auto px-8 py-8 max-w-7xl">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-4xl font-bold text-foreground">
+        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+          <div className="flex items-center space-x-6">
+            <h1 className="text-4xl font-bold text-gray-900">
               {request.request_number}
             </h1>
             {getStatusBadge(request.status)}
-            <span className="text-muted-foreground text-lg">
+            <span className="text-gray-600 text-lg">
               Created on {new Date(request.created_at).toLocaleDateString()}
             </span>
           </div>
@@ -295,134 +295,145 @@ export const RequestDetail = () => {
           <Button 
             variant="ghost" 
             onClick={() => navigate('/dashboard')}
-            className="text-muted-foreground hover:text-foreground text-lg"
+            className="text-gray-600 hover:text-gray-900 text-lg font-medium"
           >
             Back to Dashboard
           </Button>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Column - General Information & Items */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className="lg:col-span-3 space-y-8">
             {/* General Information */}
-            <div>
-              <div className="flex items-center space-x-3 mb-8">
-                <FileText className="h-6 w-6 text-muted-foreground" />
-                <h2 className="text-2xl font-semibold">General Information</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <FileText className="h-5 w-5 text-gray-600" />
+                  <h2 className="text-xl font-semibold text-gray-900">General Information</h2>
+                </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-x-12 gap-y-8">
-                <div>
-                  <div className="text-muted-foreground mb-2">Journal Name</div>
-                  <div className="text-lg font-medium">{request.request_type}</div>
-                </div>
-                
-                <div>
-                  <div className="text-muted-foreground mb-2">Date</div>
-                  <div className="text-lg font-medium">{new Date(request.created_at).toLocaleDateString()}</div>
-                </div>
-                
-                <div>
-                  <div className="text-muted-foreground mb-2">Request Type</div>
-                  <div className="text-lg font-medium">{request.request_type}</div>
-                </div>
-                
-                {request.delivery_date && (
-                  <div>
-                    <div className="text-muted-foreground mb-2">Delivery Date</div>
-                    <div className="text-lg font-medium">{new Date(request.delivery_date).toLocaleDateString()}</div>
+              <div className="p-6">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-500 font-medium">Journal Name</div>
+                    <div className="text-lg font-medium text-gray-900">{request.request_type}</div>
                   </div>
-                )}
-                
-                {request.preferred_supplier && (
-                  <div>
-                    <div className="text-muted-foreground mb-2">Preferred Supplier</div>
-                    <div className="text-lg font-medium">{request.preferred_supplier}</div>
+                  
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-500 font-medium">Date</div>
+                    <div className="text-lg font-medium text-gray-900">{new Date(request.created_at).toLocaleDateString()}</div>
                   </div>
-                )}
+                  
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-500 font-medium">Request Type</div>
+                    <div className="text-lg font-medium text-gray-900">{request.request_type}</div>
+                  </div>
+                  
+                  {request.delivery_date && (
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 font-medium">Delivery Date</div>
+                      <div className="text-lg font-medium text-gray-900">{new Date(request.delivery_date).toLocaleDateString()}</div>
+                    </div>
+                  )}
+                  
+                  {request.preferred_supplier && (
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 font-medium">Preferred Supplier</div>
+                      <div className="text-lg font-medium text-gray-900">{request.preferred_supplier}</div>
+                    </div>
+                  )}
+                  
+                  {request.client_name && (
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 font-medium">Client Name</div>
+                      <div className="text-lg font-medium text-gray-900">{request.client_name}</div>
+                    </div>
+                  )}
+                </div>
                 
-                {request.client_name && (
-                  <div>
-                    <div className="text-muted-foreground mb-2">Client Name</div>
-                    <div className="text-lg font-medium">{request.client_name}</div>
+                {request.justification && (
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 font-medium">Reason</div>
+                      <div className="text-lg font-medium text-gray-900">{request.justification}</div>
+                    </div>
                   </div>
                 )}
               </div>
-              
-              {request.justification && (
-                <div className="mt-8">
-                  <div className="text-muted-foreground mb-2">Reason</div>
-                  <div className="text-lg font-medium">{request.justification}</div>
-                </div>
-              )}
             </div>
 
             {/* Items Section */}
-            <div>
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="h-6 w-6 bg-foreground rounded flex items-center justify-center">
-                  <div className="h-3 w-3 bg-background rounded"></div>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="h-5 w-5 bg-gray-900 rounded-sm flex items-center justify-center">
+                    <div className="h-2 w-2 bg-white rounded-sm"></div>
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Items ({request.request_items.length})</h2>
                 </div>
-                <h2 className="text-2xl font-semibold">Items ({request.request_items.length})</h2>
               </div>
               
-              <div className="space-y-8">
-                {request.request_items.map((item, index) => (
-                  <div key={index}>
-                    <h3 className="text-xl font-medium mb-4">Item {index + 1}</h3>
-                    <div className="grid grid-cols-4 gap-8 text-base">
-                      <div>
-                        <div className="text-muted-foreground mb-1">Code</div>
-                        <div className="font-medium">{item.item_code}</div>
+              <div className="p-6">
+                <div className="space-y-8">
+                  {request.request_items.map((item, index) => (
+                    <div key={index} className={index !== request.request_items.length - 1 ? "pb-8 border-b border-gray-100" : ""}>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Item {index + 1}</h3>
+                      <div className="grid grid-cols-4 gap-6">
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500 font-medium">Code</div>
+                          <div className="text-base font-medium text-gray-900">{item.item_code}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500 font-medium">Description</div>
+                          <div className="text-base font-medium text-gray-900">{item.description}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500 font-medium">Quantity</div>
+                          <div className="text-base font-medium text-gray-900">{item.quantity} {item.unit}</div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500 font-medium">Type</div>
+                          <div className="text-base font-medium text-gray-900">{item.supplier || 'Standard'}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-muted-foreground mb-1">Description</div>
-                        <div className="font-medium">{item.description}</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground mb-1">Quantity</div>
-                        <div className="font-medium">{item.quantity} {item.unit}</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground mb-1">Type</div>
-                        <div className="font-medium">{item.supplier || 'Standard'}</div>
-                      </div>
+                      {item.notes && (
+                        <div className="mt-4 space-y-1">
+                          <div className="text-sm text-gray-500 font-medium">Notes</div>
+                          <div className="text-base text-gray-700">{item.notes}</div>
+                        </div>
+                      )}
                     </div>
-                    {item.notes && (
-                      <div className="mt-4">
-                        <div className="text-muted-foreground mb-1">Notes</div>
-                        <div className="text-base">{item.notes}</div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              
-              {request.total_amount && request.total_amount > 0 && (
-                <div className="border-t pt-6 mt-8">
-                  <div className="text-xl font-semibold text-right">
-                    Total Amount: ${request.total_amount}
-                  </div>
+                  ))}
                 </div>
-              )}
+                
+                {request.total_amount && request.total_amount > 0 && (
+                  <div className="border-t border-gray-100 pt-6 mt-8">
+                    <div className="text-xl font-semibold text-gray-900 text-right">
+                      Total Amount: ${request.total_amount}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Actions Card for mobile */}
             {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
-              <Card className="lg:hidden">
-                <CardHeader>
-                  <CardTitle>Actions</CardTitle>
+              <Card className="lg:hidden bg-white shadow-sm border border-gray-200">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-lg font-semibold text-gray-900">Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-6 space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="comments-mobile">Comments</Label>
+                    <Label htmlFor="comments-mobile" className="text-sm font-medium text-gray-700">Comments</Label>
                     <Textarea
                       id="comments-mobile"
                       value={comments}
                       onChange={(e) => setComments(e.target.value)}
                       placeholder="Add comments..."
                       rows={3}
+                      className="border-gray-200"
                     />
                   </div>
                   
@@ -432,7 +443,7 @@ export const RequestDetail = () => {
                         <Button 
                           onClick={handleApprove} 
                           disabled={actionLoading}
-                          className="w-full"
+                          className="w-full bg-green-600 hover:bg-green-700"
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approve Request
@@ -453,7 +464,7 @@ export const RequestDetail = () => {
                       <Button 
                         onClick={handleComplete} 
                         disabled={actionLoading}
-                        className="w-full"
+                        className="w-full bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Mark as Completed
@@ -477,187 +488,221 @@ export const RequestDetail = () => {
           </div>
 
           {/* Right Column - Timeline */}
-          <div className="space-y-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="h-6 w-6 border-2 border-foreground rounded-full flex items-center justify-center">
-                  <div className="h-2 w-2 bg-foreground rounded-full"></div>
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-8">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <Calendar className="h-5 w-5 text-gray-600" />
+                  <h2 className="text-xl font-semibold text-gray-900">Timeline</h2>
                 </div>
-                <h2 className="text-2xl font-semibold">Timeline</h2>
               </div>
               
-              <div className="space-y-8">
-                {/* Requested */}
-                <div className="flex items-start space-x-4">
-                  <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-lg">Requested</div>
-                    <div className="text-muted-foreground">
-                      by {request.requester.full_name}
-                    </div>
-                    <div className="text-muted-foreground">
-                      {new Date(request.created_at).toLocaleDateString()}, {new Date(request.created_at).toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit', 
-                        second: '2-digit',
-                        hour12: true 
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Manager Approval */}
-                {request.manager_approved_at && request.manager_approval && (
+              <div className="p-6">
+                <div className="space-y-6">
+                  {/* Requested */}
                   <div className="flex items-start space-x-4">
-                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg">Manager Approved</div>
-                      <div className="text-muted-foreground">
-                        by {request.manager_approval.full_name}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {new Date(request.manager_approved_at).toLocaleDateString()}, {new Date(request.manager_approved_at).toLocaleTimeString('en-US', { 
-                          hour: 'numeric', 
-                          minute: '2-digit', 
-                          hour12: true 
-                        })}
-                      </div>
-                      {request.manager_comments && (
-                        <div className="text-muted-foreground italic mt-1">
-                          "{request.manager_comments}"
-                        </div>
+                    <div className="flex flex-col items-center">
+                      <div className="h-3 w-3 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                      {(request.manager_approved_at || request.status === 'pending_approval') && (
+                        <div className="w-px h-8 bg-gray-200 mt-1"></div>
                       )}
                     </div>
-                  </div>
-                )}
-
-                {/* Final Approval (only show if approved but not completed) */}
-                {request.status === 'approved' && !request.procurement_completed_at && (
-                  <div className="flex items-start space-x-4">
-                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg">Final Approval</div>
-                      <div className="text-muted-foreground">
-                        by Finance Controller
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900">Requested</div>
+                      <div className="text-sm text-gray-600">
+                        by {request.requester.full_name}
                       </div>
-                      <div className="text-muted-foreground">
-                        {new Date(request.manager_approved_at || request.created_at).toLocaleDateString()}, {new Date(request.manager_approved_at || request.created_at).toLocaleTimeString('en-US', { 
-                          hour: 'numeric', 
-                          minute: '2-digit', 
-                          hour12: true 
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Completion */}
-                {request.procurement_completed_at && request.procurement_handler && (
-                  <div className="flex items-start space-x-4">
-                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg">Completed</div>
-                      <div className="text-muted-foreground">
-                        by {request.procurement_handler.full_name}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {new Date(request.procurement_completed_at).toLocaleDateString()}, {new Date(request.procurement_completed_at).toLocaleTimeString('en-US', { 
+                      <div className="text-sm text-gray-500">
+                        {new Date(request.created_at).toLocaleDateString()}, {new Date(request.created_at).toLocaleTimeString('en-US', { 
                           hour: 'numeric', 
                           minute: '2-digit', 
                           second: '2-digit',
                           hour12: true 
                         })}
                       </div>
-                      {request.procurement_notes && (
-                        <div className="text-muted-foreground italic mt-1">
-                          "{request.procurement_notes}"
+                    </div>
+                  </div>
+
+                  {/* Manager Approval */}
+                  {request.manager_approved_at && request.manager_approval ? (
+                    <div className="flex items-start space-x-4">
+                      <div className="flex flex-col items-center">
+                        <div className="h-3 w-3 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        {(!request.procurement_completed_at && request.status === 'approved') && (
+                          <div className="w-px h-8 bg-gray-200 mt-1"></div>
+                        )}
+                        {request.procurement_completed_at && (
+                          <div className="w-px h-8 bg-gray-200 mt-1"></div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900">Manager Approved</div>
+                        <div className="text-sm text-gray-600">
+                          by {request.manager_approval.full_name}
                         </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(request.manager_approved_at).toLocaleDateString()}, {new Date(request.manager_approved_at).toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit', 
+                            hour12: true 
+                          })}
+                        </div>
+                        {request.manager_comments && (
+                          <div className="text-sm text-gray-500 italic mt-1">
+                            "{request.manager_comments}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : request.status === 'pending_approval' ? (
+                    <div className="flex items-start space-x-4">
+                      <div className="flex flex-col items-center">
+                        <div className="h-3 w-3 border-2 border-gray-300 rounded-full mt-1.5 flex-shrink-0 bg-white"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-500">Pending Manager Approval</div>
+                        <div className="text-sm text-gray-400">Waiting for manager review</div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* Final Approval (only show if approved but not completed) */}
+                  {request.status === 'approved' && !request.procurement_completed_at && (
+                    <div className="flex items-start space-x-4">
+                      <div className="flex flex-col items-center">
+                        <div className="h-3 w-3 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                        <div className="w-px h-8 bg-gray-200 mt-1"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900">Final Approval</div>
+                        <div className="text-sm text-gray-600">
+                          by Finance Controller
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(request.manager_approved_at || request.created_at).toLocaleDateString()}, {new Date(request.manager_approved_at || request.created_at).toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit', 
+                            hour12: true 
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Completion */}
+                  {request.procurement_completed_at && request.procurement_handler ? (
+                    <div className="flex items-start space-x-4">
+                      <div className="h-3 w-3 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900">Completed</div>
+                        <div className="text-sm text-gray-600">
+                          by {request.procurement_handler.full_name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(request.procurement_completed_at).toLocaleDateString()}, {new Date(request.procurement_completed_at).toLocaleTimeString('en-US', { 
+                            hour: 'numeric', 
+                            minute: '2-digit', 
+                            second: '2-digit',
+                            hour12: true 
+                          })}
+                        </div>
+                        {request.procurement_notes && (
+                          <div className="text-sm text-gray-500 italic mt-1">
+                            "{request.procurement_notes}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : request.status === 'approved' && !request.procurement_completed_at ? (
+                    <div className="flex items-start space-x-4">
+                      <div className="h-3 w-3 border-2 border-gray-300 rounded-full mt-1.5 flex-shrink-0 bg-white"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-500">Pending Completion</div>
+                        <div className="text-sm text-gray-400">Waiting for procurement</div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* Rejection */}
+                  {request.rejection_reason && (
+                    <div className="flex items-start space-x-4">
+                      <div className="h-3 w-3 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-red-600">Rejected</div>
+                        <div className="text-sm text-gray-600">
+                          Reason: {request.rejection_reason}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions for desktop */}
+              {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
+                <div className="border-t border-gray-100 p-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="comments" className="text-sm font-medium text-gray-700">Comments</Label>
+                      <Textarea
+                        id="comments"
+                        value={comments}
+                        onChange={(e) => setComments(e.target.value)}
+                        placeholder="Add comments..."
+                        rows={3}
+                        className="border-gray-200"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {userCanApprove && request.status === 'pending_approval' && (
+                        <>
+                          <Button 
+                            onClick={handleApprove} 
+                            disabled={actionLoading}
+                            className="w-full bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Approve Request
+                          </Button>
+                          <Button 
+                            onClick={handleReject} 
+                            disabled={actionLoading}
+                            variant="destructive"
+                            className="w-full"
+                          >
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Reject Request
+                          </Button>
+                        </>
+                      )}
+                      
+                      {userCanManage && request.status === 'approved' && (
+                        <Button 
+                          onClick={handleComplete} 
+                          disabled={actionLoading}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Mark as Completed
+                        </Button>
+                      )}
+                      
+                      {userCanManage && (request.status === 'approved' || request.status === 'pending_approval') && (
+                        <Button 
+                          onClick={handleCancel} 
+                          disabled={actionLoading}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Cancel for Editing
+                        </Button>
                       )}
                     </div>
                   </div>
-                )}
-
-                {/* Rejection */}
-                {request.rejection_reason && (
-                  <div className="flex items-start space-x-4">
-                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg text-red-500">Rejected</div>
-                      <div className="text-muted-foreground">
-                        Reason: {request.rejection_reason}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-
-            {/* Actions for desktop */}
-            {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
-              <Card className="hidden lg:block">
-                <CardHeader>
-                  <CardTitle>Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="comments">Comments</Label>
-                    <Textarea
-                      id="comments"
-                      value={comments}
-                      onChange={(e) => setComments(e.target.value)}
-                      placeholder="Add comments..."
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {userCanApprove && request.status === 'pending_approval' && (
-                      <>
-                        <Button 
-                          onClick={handleApprove} 
-                          disabled={actionLoading}
-                          className="w-full"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve Request
-                        </Button>
-                        <Button 
-                          onClick={handleReject} 
-                          disabled={actionLoading}
-                          variant="destructive"
-                          className="w-full"
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject Request
-                        </Button>
-                      </>
-                    )}
-                    
-                    {userCanManage && request.status === 'approved' && (
-                      <Button 
-                        onClick={handleComplete} 
-                        disabled={actionLoading}
-                        className="w-full"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark as Completed
-                      </Button>
-                    )}
-                    
-                    {userCanManage && (request.status === 'approved' || request.status === 'pending_approval') && (
-                      <Button 
-                        onClick={handleCancel} 
-                        disabled={actionLoading}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Cancel for Editing
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
