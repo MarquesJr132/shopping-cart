@@ -418,73 +418,6 @@ export const RequestDetail = () => {
               </div>
             </div>
 
-            {/* Actions Card for mobile only */}
-            {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
-              <div className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900">Actions</h3>
-                </div>
-                <div className="p-6 space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="comments-mobile" className="text-sm font-medium text-gray-700">Comments</Label>
-                    <Textarea
-                      id="comments-mobile"
-                      value={comments}
-                      onChange={(e) => setComments(e.target.value)}
-                      placeholder="Add comments..."
-                      rows={3}
-                      className="border-gray-200"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {userCanApprove && request.status === 'pending_approval' && (
-                      <>
-                        <Button 
-                          onClick={handleApprove} 
-                          disabled={actionLoading}
-                          className="w-full bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve Request
-                        </Button>
-                        <Button 
-                          onClick={handleReject} 
-                          disabled={actionLoading}
-                          variant="destructive"
-                          className="w-full"
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject Request
-                        </Button>
-                      </>
-                    )}
-                    
-                    {userCanManage && request.status === 'approved' && (
-                      <Button 
-                        onClick={handleComplete} 
-                        disabled={actionLoading}
-                        className="w-full bg-green-600 hover:bg-green-700"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark as Completed
-                      </Button>
-                    )}
-                    
-                    {userCanManage && (request.status === 'approved' || request.status === 'pending_approval') && (
-                      <Button 
-                        onClick={handleCancel} 
-                        disabled={actionLoading}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Cancel for Editing
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Column - Timeline */}
@@ -638,73 +571,76 @@ export const RequestDetail = () => {
                 </div>
               </div>
 
-              {/* Actions for desktop */}
-              {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
-                <div className="border-t border-gray-100 p-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="comments" className="text-sm font-medium text-gray-700">Comments</Label>
-                      <Textarea
-                        id="comments"
-                        value={comments}
-                        onChange={(e) => setComments(e.target.value)}
-                        placeholder="Add comments..."
-                        rows={3}
-                        className="border-gray-200"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      {userCanApprove && request.status === 'pending_approval' && (
-                        <>
-                          <Button 
-                            onClick={handleApprove} 
-                            disabled={actionLoading}
-                            className="w-full bg-green-600 hover:bg-green-700"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Approve Request
-                          </Button>
-                          <Button 
-                            onClick={handleReject} 
-                            disabled={actionLoading}
-                            variant="destructive"
-                            className="w-full"
-                          >
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Reject Request
-                          </Button>
-                        </>
-                      )}
-                      
-                      {userCanManage && request.status === 'approved' && (
-                        <Button 
-                          onClick={handleComplete} 
-                          disabled={actionLoading}
-                          className="w-full bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Mark as Completed
-                        </Button>
-                      )}
-                      
-                      {userCanManage && (request.status === 'approved' || request.status === 'pending_approval') && (
-                        <Button 
-                          onClick={handleCancel} 
-                          disabled={actionLoading}
-                          variant="outline"
-                          className="w-full"
-                        >
-                          Cancel for Editing
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
+
+        {/* Actions Section - Centered at bottom */}
+        {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
+          <div className="mt-8 max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="comments-main" className="text-sm font-medium text-gray-700">Comments</Label>
+                  <Textarea
+                    id="comments-main"
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value)}
+                    placeholder="Add comments..."
+                    rows={3}
+                    className="border-gray-200"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {userCanApprove && request.status === 'pending_approval' && (
+                    <>
+                      <Button 
+                        onClick={handleApprove} 
+                        disabled={actionLoading}
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3"
+                      >
+                        <CheckCircle className="h-5 w-5 mr-2" />
+                        Approve Request
+                      </Button>
+                      <Button 
+                        onClick={handleReject} 
+                        disabled={actionLoading}
+                        variant="destructive"
+                        className="font-semibold py-3"
+                      >
+                        <XCircle className="h-5 w-5 mr-2" />
+                        Reject Request
+                      </Button>
+                    </>
+                  )}
+                  
+                  {userCanManage && request.status === 'approved' && (
+                    <Button 
+                      onClick={handleComplete} 
+                      disabled={actionLoading}
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 md:col-span-2"
+                    >
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      Mark as Completed
+                    </Button>
+                  )}
+                  
+                  {userCanManage && (request.status === 'approved' || request.status === 'pending_approval') && (
+                    <Button 
+                      onClick={handleCancel} 
+                      disabled={actionLoading}
+                      variant="outline"
+                      className="font-semibold py-3 md:col-span-2"
+                    >
+                      Cancel for Editing
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
