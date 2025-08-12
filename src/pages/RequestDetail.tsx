@@ -280,182 +280,132 @@ export const RequestDetail = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/dashboard')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            
-            <div className="flex items-center space-x-3">
-              {canEdit && (
-                <Button size="sm" onClick={() => navigate(`/request/edit/${request.id}`)}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
-              )}
-              {userCanGeneratePDF && (
-                <Button size="sm" variant="outline" onClick={generatePDF}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  PDF
-                </Button>
-              )}
-            </div>
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-4xl font-bold text-foreground">
+              {request.request_number}
+            </h1>
+            {getStatusBadge(request.status)}
+            <span className="text-muted-foreground">
+              Created on {new Date(request.created_at).toLocaleDateString()}
+            </span>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-4xl font-bold tracking-tight">
-                {request.request_number}
-              </h1>
-              {getStatusBadge(request.status)}
-            </div>
-            <p className="text-lg text-muted-foreground">
-              Created on {new Date(request.created_at).toLocaleDateString()}
-            </p>
+          <div className="flex items-center space-x-3">
+            {canEdit && (
+              <Button size="sm" onClick={() => navigate(`/request/edit/${request.id}`)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+            {userCanGeneratePDF && (
+              <Button size="sm" variant="outline" onClick={generatePDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                Generate PDF
+              </Button>
+            )}
+            <Button variant="ghost" onClick={() => navigate('/dashboard')}>
+              Back to Dashboard
+            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            {/* General Information */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-muted/30 border-b">
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">Request Information</CardTitle>
-                    <p className="text-sm text-muted-foreground">Basic details and specifications</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid gap-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Request Type</div>
-                      <div className="text-lg font-semibold">{request.request_type}</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Created Date</div>
-                      <div className="text-lg font-semibold">{new Date(request.created_at).toLocaleDateString()}</div>
-                    </div>
-                    {request.delivery_date && (
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Delivery Date</div>
-                        <div className="text-lg font-semibold">{new Date(request.delivery_date).toLocaleDateString()}</div>
-                      </div>
-                    )}
-                    {request.preferred_supplier && (
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Preferred Supplier</div>
-                        <div className="text-lg font-semibold">{request.preferred_supplier}</div>
-                      </div>
-                    )}
-                    {request.client_name && (
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Client Name</div>
-                        <div className="text-lg font-semibold">{request.client_name}</div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {request.justification && (
-                    <div className="pt-4 border-t">
-                      <div className="space-y-2">
-                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Justification</div>
-                        <div className="text-base leading-relaxed bg-muted/30 p-4 rounded-lg">
-                          {request.justification}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Items Section */}
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-muted/30 border-b">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <div className="h-5 w-5 bg-primary rounded-md" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">Items Requested</CardTitle>
-                      <p className="text-sm text-muted-foreground">{request.request_items.length} item{request.request_items.length !== 1 ? 's' : ''} total</p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y">
-                  {request.request_items.map((item, index) => (
-                    <div key={index} className="p-6 hover:bg-muted/20 transition-colors">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg text-foreground mb-1">
-                            {item.description}
-                          </h3>
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                            <span className="font-mono bg-muted px-2 py-1 rounded text-xs">
-                              {item.item_code}
-                            </span>
-                            <span className="font-medium">
-                              {item.quantity} {item.unit}
-                            </span>
-                            {item.supplier && (
-                              <span className="text-primary">
-                                {item.supplier}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {(item.unit_price || item.total_price) && (
-                          <div className="text-right ml-4">
-                            {item.unit_price && (
-                              <div className="text-sm text-muted-foreground">
-                                ${item.unit_price}/{item.unit}
-                              </div>
-                            )}
-                            {item.total_price && (
-                              <div className="font-semibold text-lg">
-                                ${item.total_price}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {item.notes && (
-                        <div className="mt-3 p-3 bg-muted/30 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-1">Notes</div>
-                          <div className="text-sm">{item.notes}</div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - General Information */}
+          <div className="lg:col-span-2 space-y-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-6">
+                <FileText className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-2xl font-semibold">General Information</h2>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">Journal Name</div>
+                  <div className="font-medium">{request.request_type}</div>
                 </div>
                 
-                {request.total_amount && request.total_amount > 0 && (
-                  <div className="border-t bg-muted/30 p-6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-medium">Total Amount</span>
-                      <span className="text-2xl font-bold text-primary">
-                        ${request.total_amount}
-                      </span>
-                    </div>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">Date</div>
+                  <div className="font-medium">{new Date(request.created_at).toLocaleDateString()}</div>
+                </div>
+                
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">Request Type</div>
+                  <div className="font-medium">{request.request_type}</div>
+                </div>
+                
+                {request.delivery_date && (
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Delivery Date</div>
+                    <div className="font-medium">{new Date(request.delivery_date).toLocaleDateString()}</div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+                
+                {request.preferred_supplier && (
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Preferred Supplier</div>
+                    <div className="font-medium">{request.preferred_supplier}</div>
+                  </div>
+                )}
+                
+                {request.client_name && (
+                  <div>
+                    <div className="text-sm text-muted-foreground mb-1">Client Name</div>
+                    <div className="font-medium">{request.client_name}</div>
+                  </div>
+                )}
+              </div>
+              
+              {request.justification && (
+                <div className="mt-6">
+                  <div className="text-sm text-muted-foreground mb-1">Reason</div>
+                  <div className="font-medium">{request.justification}</div>
+                </div>
+              )}
+            </div>
+
+            {/* Items Section */}
+            <div>
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="h-5 w-5 bg-foreground rounded-sm"></div>
+                <h2 className="text-2xl font-semibold">Items ({request.request_items.length})</h2>
+              </div>
+              
+              <div className="space-y-6">
+                {request.request_items.map((item, index) => (
+                  <div key={index} className="border-b pb-6 last:border-b-0">
+                    <h3 className="font-semibold text-lg mb-3">Item {index + 1}</h3>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Code</div>
+                        <div className="font-medium">{item.item_code}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Description</div>
+                        <div className="font-medium">{item.description}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Quantity</div>
+                        <div className="font-medium">{item.quantity} {item.unit}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Type</div>
+                        <div className="font-medium">{item.supplier || 'Standard'}</div>
+                      </div>
+                    </div>
+                    {item.notes && (
+                      <div className="mt-3">
+                        <div className="text-sm text-muted-foreground mb-1">Notes</div>
+                        <div className="text-sm">{item.notes}</div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Actions Card for mobile */}
             {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
@@ -525,29 +475,29 @@ export const RequestDetail = () => {
             )}
           </div>
 
-          {/* Timeline Sidebar */}
+          {/* Right Column - Timeline */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-                <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                  <div className="h-4 w-4 border-2 border-primary rounded-full" />
-                </div>
-                <CardTitle>Timeline</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center space-x-2 mb-6">
+                <div className="h-5 w-5 border-2 border-foreground rounded-full"></div>
+                <h2 className="text-2xl font-semibold">Timeline</h2>
+              </div>
+              
+              <div className="space-y-6">
                 {/* Requested */}
                 <div className="flex items-start space-x-3">
-                  <div className="flex flex-col items-center">
-                    <div className="h-3 w-3 bg-destructive rounded-full mt-1" />
-                    <div className="w-px h-6 bg-border" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm">Requested</div>
-                    <div className="text-xs text-muted-foreground">
+                  <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
+                  <div>
+                    <div className="font-medium">Requested</div>
+                    <div className="text-sm text-muted-foreground">
                       by {request.requester.full_name}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(request.created_at).toLocaleDateString()}, {new Date(request.created_at).toLocaleTimeString()}
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(request.created_at).toLocaleDateString()}, {new Date(request.created_at).toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit', 
+                        hour12: true 
+                      })}
                     </div>
                   </div>
                 </div>
@@ -555,22 +505,21 @@ export const RequestDetail = () => {
                 {/* Manager Approval */}
                 {request.manager_approved_at && request.manager_approval ? (
                   <div className="flex items-start space-x-3">
-                    <div className="flex flex-col items-center">
-                      <div className="h-3 w-3 bg-green-500 rounded-full mt-1" />
-                      {(request.procurement_completed_at || request.rejection_reason) && (
-                        <div className="w-px h-6 bg-border" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">Manager Approved</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2"></div>
+                    <div>
+                      <div className="font-medium">Manager Approved</div>
+                      <div className="text-sm text-muted-foreground">
                         by {request.manager_approval.full_name}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(request.manager_approved_at).toLocaleDateString()}, {new Date(request.manager_approved_at).toLocaleTimeString()}
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(request.manager_approved_at).toLocaleDateString()}, {new Date(request.manager_approved_at).toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit', 
+                          hour12: true 
+                        })}
                       </div>
                       {request.manager_comments && (
-                        <div className="text-xs text-muted-foreground italic mt-1">
+                        <div className="text-sm text-muted-foreground italic mt-1">
                           "{request.manager_comments}"
                         </div>
                       )}
@@ -578,46 +527,55 @@ export const RequestDetail = () => {
                   </div>
                 ) : request.status === 'pending_approval' ? (
                   <div className="flex items-start space-x-3">
-                    <div className="flex flex-col items-center">
-                      <div className="h-3 w-3 border-2 border-muted-foreground rounded-full mt-1" />
-                      <div className="w-px h-6 bg-border" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-muted-foreground">Pending Manager Approval</div>
-                      <div className="text-xs text-muted-foreground">Waiting for manager review</div>
+                    <div className="h-3 w-3 border-2 border-muted-foreground rounded-full mt-2"></div>
+                    <div>
+                      <div className="font-medium text-muted-foreground">Pending Manager Approval</div>
+                      <div className="text-sm text-muted-foreground">Waiting for manager review</div>
                     </div>
                   </div>
                 ) : null}
 
-                {/* Completion or Final Approval */}
+                {/* Final Approval (if applicable) */}
+                {request.status === 'approved' && !request.procurement_completed_at && (
+                  <div className="flex items-start space-x-3">
+                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2"></div>
+                    <div>
+                      <div className="font-medium">Final Approval</div>
+                      <div className="text-sm text-muted-foreground">
+                        by Finance Controller
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(request.manager_approved_at || request.created_at).toLocaleDateString()}, {new Date(request.manager_approved_at || request.created_at).toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit', 
+                          hour12: true 
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Completion */}
                 {request.procurement_completed_at && request.procurement_handler ? (
                   <div className="flex items-start space-x-3">
-                    <div className="flex flex-col items-center">
-                      <div className="h-3 w-3 bg-green-500 rounded-full mt-1" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">Completed</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
+                    <div>
+                      <div className="font-medium">Completed</div>
+                      <div className="text-sm text-muted-foreground">
                         by {request.procurement_handler.full_name}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(request.procurement_completed_at).toLocaleDateString()}, {new Date(request.procurement_completed_at).toLocaleTimeString()}
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(request.procurement_completed_at).toLocaleDateString()}, {new Date(request.procurement_completed_at).toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit', 
+                          hour12: true 
+                        })}
                       </div>
                       {request.procurement_notes && (
-                        <div className="text-xs text-muted-foreground italic mt-1">
+                        <div className="text-sm text-muted-foreground italic mt-1">
                           "{request.procurement_notes}"
                         </div>
                       )}
-                    </div>
-                  </div>
-                ) : request.status === 'approved' ? (
-                  <div className="flex items-start space-x-3">
-                    <div className="flex flex-col items-center">
-                      <div className="h-3 w-3 border-2 border-muted-foreground rounded-full mt-1" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-muted-foreground">Pending Completion</div>
-                      <div className="text-xs text-muted-foreground">Waiting for procurement</div>
                     </div>
                   </div>
                 ) : null}
@@ -625,19 +583,17 @@ export const RequestDetail = () => {
                 {/* Rejection */}
                 {request.rejection_reason && (
                   <div className="flex items-start space-x-3">
-                    <div className="flex flex-col items-center">
-                      <div className="h-3 w-3 bg-destructive rounded-full mt-1" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-destructive">Rejected</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
+                    <div>
+                      <div className="font-medium text-red-500">Rejected</div>
+                      <div className="text-sm text-muted-foreground">
                         Reason: {request.rejection_reason}
                       </div>
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Actions for desktop */}
             {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
