@@ -14,16 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          manager_id: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          manager_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          manager_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          item_code: string
+          notes: string | null
+          quantity: number
+          request_id: string
+          supplier: string | null
+          total_price: number | null
+          unit: string
+          unit_price: number | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          item_code: string
+          notes?: string | null
+          quantity: number
+          request_id: string
+          supplier?: string | null
+          total_price?: number | null
+          unit: string
+          unit_price?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          item_code?: string
+          notes?: string | null
+          quantity?: number
+          request_id?: string
+          supplier?: string | null
+          total_price?: number | null
+          unit?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shopping_cart_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          item_code: string
+          notes: string | null
+          quantity: number
+          supplier: string | null
+          total_price: number | null
+          unit: string
+          unit_price: number | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          item_code: string
+          notes?: string | null
+          quantity: number
+          supplier?: string | null
+          total_price?: number | null
+          unit: string
+          unit_price?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          item_code?: string
+          notes?: string | null
+          quantity?: number
+          supplier?: string | null
+          total_price?: number | null
+          unit?: string
+          unit_price?: number | null
+        }
+        Relationships: []
+      }
+      shopping_requests: {
+        Row: {
+          client_id: string | null
+          client_name: string | null
+          created_at: string
+          delivery_date: string | null
+          id: string
+          justification: string | null
+          manager_approval_id: string | null
+          manager_approved_at: string | null
+          manager_comments: string | null
+          preferred_supplier: string | null
+          procurement_completed_at: string | null
+          procurement_handled_by: string | null
+          procurement_notes: string | null
+          rejection_reason: string | null
+          request_number: string
+          request_type: string
+          requester_id: string
+          status: string
+          total_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          client_name?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          id?: string
+          justification?: string | null
+          manager_approval_id?: string | null
+          manager_approved_at?: string | null
+          manager_comments?: string | null
+          preferred_supplier?: string | null
+          procurement_completed_at?: string | null
+          procurement_handled_by?: string | null
+          procurement_notes?: string | null
+          rejection_reason?: string | null
+          request_number: string
+          request_type: string
+          requester_id: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          client_name?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          id?: string
+          justification?: string | null
+          manager_approval_id?: string | null
+          manager_approved_at?: string | null
+          manager_comments?: string | null
+          preferred_supplier?: string | null
+          procurement_completed_at?: string | null
+          procurement_handled_by?: string | null
+          procurement_notes?: string | null
+          rejection_reason?: string | null
+          request_number?: string
+          request_type?: string
+          requester_id?: string
+          status?: string
+          total_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_requests_manager_approval_id_fkey"
+            columns: ["manager_approval_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_requests_procurement_handled_by_fkey"
+            columns: ["procurement_handled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_request_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "user" | "manager" | "procurement"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +373,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["user", "manager", "procurement"],
+    },
   },
 } as const
