@@ -23,6 +23,11 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!user || !profile) {
     return <Navigate to="/auth" replace />;
   }
+
+  // Redirect admin users to admin dashboard only
+  if (profile.role === 'admin' && window.location.pathname !== '/admin') {
+    return <Navigate to="/admin" replace />;
+  }
   
   return <>{children}</>;
 };

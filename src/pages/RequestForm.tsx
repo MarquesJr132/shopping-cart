@@ -343,9 +343,9 @@ export const RequestForm = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {items.map((item, index) => (
-                    <div key={index} className="border rounded-lg p-4 space-y-4">
+                    <div key={index} className="border rounded-lg p-3 space-y-3">
                       <div className="flex justify-between items-center">
-                        <h4 className="font-medium">Item {index + 1}</h4>
+                        <h4 className="font-medium text-sm">Item {index + 1}</h4>
                         {items.length > 1 && (
                           <Button
                             type="button"
@@ -358,36 +358,38 @@ export const RequestForm = () => {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Description</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Description</Label>
                           <Input
                             value={item.description}
                             onChange={(e) => updateItem(index, 'description', e.target.value)}
                             placeholder="Item description"
+                            className="h-8 text-sm"
                             required
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>Quantity</Label>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Quantity</Label>
                           <Input
                             type="number"
                             min="0.01"
                             step="0.01"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                            className="h-8 text-sm"
                             required
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>Unit</Label>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Unit</Label>
                           <Select 
                             value={item.unit} 
                             onValueChange={(value) => updateItem(index, 'unit', value)}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="h-8 text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -401,8 +403,8 @@ export const RequestForm = () => {
                           </Select>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label>Unit Price</Label>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Unit Price</Label>
                           <Input
                             type="number"
                             min="0"
@@ -410,32 +412,36 @@ export const RequestForm = () => {
                             value={item.unit_price || ''}
                             onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || undefined)}
                             placeholder="Optional"
+                            className="h-8 text-sm"
                           />
                         </div>
+                      </div>
 
-                        <div className="space-y-2">
-                          <Label>Supplier</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Supplier</Label>
                           <Input
                             value={item.supplier || ''}
                             onChange={(e) => updateItem(index, 'supplier', e.target.value)}
                             placeholder="Optional"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">Notes</Label>
+                          <Input
+                            value={item.notes || ''}
+                            onChange={(e) => updateItem(index, 'notes', e.target.value)}
+                            placeholder="Additional notes..."
+                            className="h-8 text-sm"
                           />
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Notes</Label>
-                        <Textarea
-                          value={item.notes || ''}
-                          onChange={(e) => updateItem(index, 'notes', e.target.value)}
-                          placeholder="Additional notes for this item..."
-                          rows={2}
-                        />
-                      </div>
-
                       {item.unit_price && (
                         <div className="flex justify-end">
-                          <Badge variant="secondary">
+                          <Badge variant="secondary" className="text-xs">
                             Total: ${(item.quantity * item.unit_price).toFixed(2)}
                           </Badge>
                         </div>
