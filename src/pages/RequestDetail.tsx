@@ -52,7 +52,7 @@ export const RequestDetail = () => {
       'pending_approval': 'warning',
       'approved': 'success',
       'rejected': 'destructive',
-      'completed': 'default',
+      'completed': 'destructive',
       'cancelled': 'secondary'
     } as const;
 
@@ -66,7 +66,7 @@ export const RequestDetail = () => {
     };
 
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'secondary'}>
+      <Badge variant={variants[status as keyof typeof variants] || 'secondary'} className="bg-red-500 text-white hover:bg-red-600">
         {labels[status as keyof typeof labels] || status}
       </Badge>
     );
@@ -279,132 +279,133 @@ export const RequestDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-6 py-8">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <div className="flex items-center space-x-4">
             <h1 className="text-4xl font-bold text-foreground">
               {request.request_number}
             </h1>
             {getStatusBadge(request.status)}
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground text-lg">
               Created on {new Date(request.created_at).toLocaleDateString()}
             </span>
           </div>
           
-          <div className="flex items-center space-x-3">
-            {canEdit && (
-              <Button size="sm" onClick={() => navigate(`/request/edit/${request.id}`)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            )}
-            {userCanGeneratePDF && (
-              <Button size="sm" variant="outline" onClick={generatePDF}>
-                <FileText className="h-4 w-4 mr-2" />
-                Generate PDF
-              </Button>
-            )}
-            <Button variant="ghost" onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
-            </Button>
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="text-muted-foreground hover:text-foreground text-lg"
+          >
+            Back to Dashboard
+          </Button>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - General Information */}
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Left Column - General Information & Items */}
+          <div className="lg:col-span-2 space-y-12">
+            {/* General Information */}
             <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <FileText className="h-5 w-5 text-muted-foreground" />
+              <div className="flex items-center space-x-3 mb-8">
+                <FileText className="h-6 w-6 text-muted-foreground" />
                 <h2 className="text-2xl font-semibold">General Information</h2>
               </div>
               
-              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+              <div className="grid grid-cols-2 gap-x-12 gap-y-8">
                 <div>
-                  <div className="text-sm text-muted-foreground mb-1">Journal Name</div>
-                  <div className="font-medium">{request.request_type}</div>
+                  <div className="text-muted-foreground mb-2">Journal Name</div>
+                  <div className="text-lg font-medium">{request.request_type}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm text-muted-foreground mb-1">Date</div>
-                  <div className="font-medium">{new Date(request.created_at).toLocaleDateString()}</div>
+                  <div className="text-muted-foreground mb-2">Date</div>
+                  <div className="text-lg font-medium">{new Date(request.created_at).toLocaleDateString()}</div>
                 </div>
                 
                 <div>
-                  <div className="text-sm text-muted-foreground mb-1">Request Type</div>
-                  <div className="font-medium">{request.request_type}</div>
+                  <div className="text-muted-foreground mb-2">Request Type</div>
+                  <div className="text-lg font-medium">{request.request_type}</div>
                 </div>
                 
                 {request.delivery_date && (
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">Delivery Date</div>
-                    <div className="font-medium">{new Date(request.delivery_date).toLocaleDateString()}</div>
+                    <div className="text-muted-foreground mb-2">Delivery Date</div>
+                    <div className="text-lg font-medium">{new Date(request.delivery_date).toLocaleDateString()}</div>
                   </div>
                 )}
                 
                 {request.preferred_supplier && (
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">Preferred Supplier</div>
-                    <div className="font-medium">{request.preferred_supplier}</div>
+                    <div className="text-muted-foreground mb-2">Preferred Supplier</div>
+                    <div className="text-lg font-medium">{request.preferred_supplier}</div>
                   </div>
                 )}
                 
                 {request.client_name && (
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">Client Name</div>
-                    <div className="font-medium">{request.client_name}</div>
+                    <div className="text-muted-foreground mb-2">Client Name</div>
+                    <div className="text-lg font-medium">{request.client_name}</div>
                   </div>
                 )}
               </div>
               
               {request.justification && (
-                <div className="mt-6">
-                  <div className="text-sm text-muted-foreground mb-1">Reason</div>
-                  <div className="font-medium">{request.justification}</div>
+                <div className="mt-8">
+                  <div className="text-muted-foreground mb-2">Reason</div>
+                  <div className="text-lg font-medium">{request.justification}</div>
                 </div>
               )}
             </div>
 
             {/* Items Section */}
             <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="h-5 w-5 bg-foreground rounded-sm"></div>
+              <div className="flex items-center space-x-3 mb-8">
+                <div className="h-6 w-6 bg-foreground rounded flex items-center justify-center">
+                  <div className="h-3 w-3 bg-background rounded"></div>
+                </div>
                 <h2 className="text-2xl font-semibold">Items ({request.request_items.length})</h2>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {request.request_items.map((item, index) => (
-                  <div key={index} className="border-b pb-6 last:border-b-0">
-                    <h3 className="font-semibold text-lg mb-3">Item {index + 1}</h3>
-                    <div className="grid grid-cols-4 gap-4">
+                  <div key={index}>
+                    <h3 className="text-xl font-medium mb-4">Item {index + 1}</h3>
+                    <div className="grid grid-cols-4 gap-8 text-base">
                       <div>
-                        <div className="text-sm text-muted-foreground mb-1">Code</div>
+                        <div className="text-muted-foreground mb-1">Code</div>
                         <div className="font-medium">{item.item_code}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-muted-foreground mb-1">Description</div>
+                        <div className="text-muted-foreground mb-1">Description</div>
                         <div className="font-medium">{item.description}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-muted-foreground mb-1">Quantity</div>
+                        <div className="text-muted-foreground mb-1">Quantity</div>
                         <div className="font-medium">{item.quantity} {item.unit}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-muted-foreground mb-1">Type</div>
+                        <div className="text-muted-foreground mb-1">Type</div>
                         <div className="font-medium">{item.supplier || 'Standard'}</div>
                       </div>
                     </div>
                     {item.notes && (
-                      <div className="mt-3">
-                        <div className="text-sm text-muted-foreground mb-1">Notes</div>
-                        <div className="text-sm">{item.notes}</div>
+                      <div className="mt-4">
+                        <div className="text-muted-foreground mb-1">Notes</div>
+                        <div className="text-base">{item.notes}</div>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
+              
+              {request.total_amount && request.total_amount > 0 && (
+                <div className="border-t pt-6 mt-8">
+                  <div className="text-xl font-semibold text-right">
+                    Total Amount: ${request.total_amount}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Actions Card for mobile */}
@@ -476,26 +477,29 @@ export const RequestDetail = () => {
           </div>
 
           {/* Right Column - Timeline */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="h-5 w-5 border-2 border-foreground rounded-full"></div>
+              <div className="flex items-center space-x-3 mb-8">
+                <div className="h-6 w-6 border-2 border-foreground rounded-full flex items-center justify-center">
+                  <div className="h-2 w-2 bg-foreground rounded-full"></div>
+                </div>
                 <h2 className="text-2xl font-semibold">Timeline</h2>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Requested */}
-                <div className="flex items-start space-x-3">
-                  <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
-                  <div>
-                    <div className="font-medium">Requested</div>
-                    <div className="text-sm text-muted-foreground">
+                <div className="flex items-start space-x-4">
+                  <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-lg">Requested</div>
+                    <div className="text-muted-foreground">
                       by {request.requester.full_name}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-muted-foreground">
                       {new Date(request.created_at).toLocaleDateString()}, {new Date(request.created_at).toLocaleTimeString('en-US', { 
                         hour: 'numeric', 
                         minute: '2-digit', 
+                        second: '2-digit',
                         hour12: true 
                       })}
                     </div>
@@ -503,15 +507,15 @@ export const RequestDetail = () => {
                 </div>
 
                 {/* Manager Approval */}
-                {request.manager_approved_at && request.manager_approval ? (
-                  <div className="flex items-start space-x-3">
-                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <div className="font-medium">Manager Approved</div>
-                      <div className="text-sm text-muted-foreground">
+                {request.manager_approved_at && request.manager_approval && (
+                  <div className="flex items-start space-x-4">
+                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-lg">Manager Approved</div>
+                      <div className="text-muted-foreground">
                         by {request.manager_approval.full_name}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground">
                         {new Date(request.manager_approved_at).toLocaleDateString()}, {new Date(request.manager_approved_at).toLocaleTimeString('en-US', { 
                           hour: 'numeric', 
                           minute: '2-digit', 
@@ -519,32 +523,24 @@ export const RequestDetail = () => {
                         })}
                       </div>
                       {request.manager_comments && (
-                        <div className="text-sm text-muted-foreground italic mt-1">
+                        <div className="text-muted-foreground italic mt-1">
                           "{request.manager_comments}"
                         </div>
                       )}
                     </div>
                   </div>
-                ) : request.status === 'pending_approval' ? (
-                  <div className="flex items-start space-x-3">
-                    <div className="h-3 w-3 border-2 border-muted-foreground rounded-full mt-2"></div>
-                    <div>
-                      <div className="font-medium text-muted-foreground">Pending Manager Approval</div>
-                      <div className="text-sm text-muted-foreground">Waiting for manager review</div>
-                    </div>
-                  </div>
-                ) : null}
+                )}
 
-                {/* Final Approval (if applicable) */}
+                {/* Final Approval (only show if approved but not completed) */}
                 {request.status === 'approved' && !request.procurement_completed_at && (
-                  <div className="flex items-start space-x-3">
-                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <div className="font-medium">Final Approval</div>
-                      <div className="text-sm text-muted-foreground">
+                  <div className="flex items-start space-x-4">
+                    <div className="h-3 w-3 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-lg">Final Approval</div>
+                      <div className="text-muted-foreground">
                         by Finance Controller
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground">
                         {new Date(request.manager_approved_at || request.created_at).toLocaleDateString()}, {new Date(request.manager_approved_at || request.created_at).toLocaleTimeString('en-US', { 
                           hour: 'numeric', 
                           minute: '2-digit', 
@@ -556,37 +552,38 @@ export const RequestDetail = () => {
                 )}
 
                 {/* Completion */}
-                {request.procurement_completed_at && request.procurement_handler ? (
-                  <div className="flex items-start space-x-3">
-                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <div className="font-medium">Completed</div>
-                      <div className="text-sm text-muted-foreground">
+                {request.procurement_completed_at && request.procurement_handler && (
+                  <div className="flex items-start space-x-4">
+                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-lg">Completed</div>
+                      <div className="text-muted-foreground">
                         by {request.procurement_handler.full_name}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground">
                         {new Date(request.procurement_completed_at).toLocaleDateString()}, {new Date(request.procurement_completed_at).toLocaleTimeString('en-US', { 
                           hour: 'numeric', 
                           minute: '2-digit', 
+                          second: '2-digit',
                           hour12: true 
                         })}
                       </div>
                       {request.procurement_notes && (
-                        <div className="text-sm text-muted-foreground italic mt-1">
+                        <div className="text-muted-foreground italic mt-1">
                           "{request.procurement_notes}"
                         </div>
                       )}
                     </div>
                   </div>
-                ) : null}
+                )}
 
                 {/* Rejection */}
                 {request.rejection_reason && (
-                  <div className="flex items-start space-x-3">
-                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <div className="font-medium text-red-500">Rejected</div>
-                      <div className="text-sm text-muted-foreground">
+                  <div className="flex items-start space-x-4">
+                    <div className="h-3 w-3 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-lg text-red-500">Rejected</div>
+                      <div className="text-muted-foreground">
                         Reason: {request.rejection_reason}
                       </div>
                     </div>
