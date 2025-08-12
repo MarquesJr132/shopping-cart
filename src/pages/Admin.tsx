@@ -240,9 +240,12 @@ export const Admin = () => {
                 <span>Add User</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px]" aria-describedby="user-form-description">
               <DialogHeader>
                 <DialogTitle>{editingProfile ? 'Edit User' : 'Create New User'}</DialogTitle>
+                <p id="user-form-description" className="text-sm text-muted-foreground">
+                  {editingProfile ? 'Update user information and permissions.' : 'Create a new user account with email and password.'}
+                </p>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
