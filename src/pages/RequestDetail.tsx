@@ -215,23 +215,26 @@ export const RequestDetail = () => {
     doc.setTextColor(100, 100, 100);
     doc.text('Sika Mozambique', 105, 30, { align: 'center' });
     
-    // Horizontal line under header
-    doc.line(20, 45, 190, 45);
+    // Horizontal line under header - closer to header
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 38, 190, 38);
     
-    // Document info with proper spacing
+    // Document info with reduced spacing
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Document ID: ${request.request_number}`, 20, 55);
-    doc.text(`Generated: ${formattedDate} ${formattedTime}`, 120, 55);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Document ID: ${request.request_number}`, 20, 48);
+    doc.text(`Generated: ${formattedDate} ${formattedTime}`, 120, 48);
     
-    // Two-column layout with gray backgrounds
+    // Two-column layout with reduced top margin
     const leftColumnX = 20;
     const rightColumnX = 110;
-    const sectionY = 70;
+    const sectionY = 58; // Reduced from 70 to 58
     
     // Requestor Information Section (left column)
-    doc.setFillColor(240, 240, 240);
-    doc.rect(leftColumnX, sectionY, 85, 8, 'F');
+    doc.setFillColor(245, 245, 245);
+    doc.rect(leftColumnX, sectionY, 85, 7, 'F');
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
