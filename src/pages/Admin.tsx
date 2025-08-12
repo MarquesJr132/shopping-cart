@@ -26,11 +26,13 @@ export const Admin = () => {
   const [formData, setFormData] = useState<{
     email: string;
     full_name: string;
+    password: string;
     role: 'user' | 'manager' | 'admin' | 'procurement';
     manager_id: string;
   }>({
     email: '',
     full_name: '',
+    password: '',
     role: 'user',
     manager_id: ''
   });
@@ -61,6 +63,7 @@ export const Admin = () => {
     setFormData({
       email: '',
       full_name: '',
+      password: '',
       role: 'user',
       manager_id: ''
     });
@@ -77,6 +80,7 @@ export const Admin = () => {
     setFormData({
       email: userToEdit.email,
       full_name: userToEdit.full_name,
+      password: '', // Don't pre-fill password for security
       role: userToEdit.role,
       manager_id: userToEdit.manager_id || ''
     });
@@ -88,6 +92,15 @@ export const Admin = () => {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!editingProfile && !formData.password) {
+      toast({
+        title: "Missing password",
+        description: "Please provide a password for the new user.",
         variant: "destructive",
       });
       return;
@@ -108,48 +121,28 @@ export const Admin = () => {
           description: `${formData.full_name} has been updated successfully.`,
         });
       } else {
-        // Create new user in Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: formData.email,
-          password: 'temp123!', // Temporary password
-          email_confirm: true,
-          user_metadata: {
-            full_name: formData.full_name
+        // Create new user using Edge Function
+        const { data: createResult, error: createError } = await supabase.functions.invoke('create-user', {
+          body: {
+            email: formData.email,
+            password: formData.password,
+            full_name: formData.full_name,
+            role: formData.role,
+            manager_id: formData.manager_id || undefined
           }
-        });
+        })
 
-        if (authError) {
-          throw authError;
+        if (createError) {
+          throw createError
         }
 
-        if (authData.user) {
-          // Create profile (this should be handled by the trigger)
-          // But we'll update it with the manager info if needed
-          if (formData.manager_id) {
-            // Wait a moment for the trigger to create the profile
-            setTimeout(async () => {
-              try {
-                const { data: profiles } = await supabase
-                  .from('profiles')
-                  .select('*')
-                  .eq('user_id', authData.user.id);
-                
-                if (profiles && profiles.length > 0) {
-                  await updateProfile(profiles[0].id, {
-                    role: formData.role,
-                    manager_id: formData.manager_id || null
-                  });
-                }
-              } catch (error) {
-                console.error('Error updating profile after creation:', error);
-              }
-            }, 1000);
-          }
+        if (!createResult?.success) {
+          throw new Error(createResult?.error || 'Failed to create user')
         }
 
         toast({
           title: "User created",
-          description: `${formData.full_name} has been created successfully with temporary password 'temp123!'.`,
+          description: `${formData.full_name} has been created successfully.`,
         });
       }
 
@@ -273,6 +266,19 @@ export const Admin = () => {
                     placeholder="Full Name"
                   />
                 </div>
+                {!editingProfile && (
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="password" className="text-right">Password*</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                      className="col-span-3"
+                      placeholder="User password"
+                    />
+                  </div>
+                )}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="role" className="text-right">Role*</Label>
                   <Select 

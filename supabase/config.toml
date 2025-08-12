@@ -1,1 +1,11 @@
 project_id = "dwlyjmgksmehgmpehzvj"
+
+[settings]
+editor = "code"
+
+[edge-runtime]
+policy = "per_worker"
+inspector_port = 8083
+
+[functions.create-user]
+verify_jwt = false
