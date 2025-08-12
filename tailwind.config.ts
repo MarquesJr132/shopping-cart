@@ -64,6 +64,8 @@ export default {
 					red: 'hsl(var(--sika-red))',
 					'red-dark': 'hsl(var(--sika-red-dark))',
 					'red-light': 'hsl(var(--sika-red-light))',
+					yellow: 'hsl(var(--sika-yellow))',
+					'yellow-light': 'hsl(var(--sika-yellow-light))',
 					gray: 'hsl(var(--sika-gray))',
 					'gray-light': 'hsl(var(--sika-gray-light))'
 				},
