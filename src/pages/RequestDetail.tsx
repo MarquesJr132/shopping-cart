@@ -279,7 +279,7 @@ export const RequestDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 max-w-7xl">`
         {/* Header Section */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center space-x-4">
