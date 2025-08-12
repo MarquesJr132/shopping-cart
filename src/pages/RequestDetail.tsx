@@ -196,142 +196,173 @@ export const RequestDetail = () => {
     if (!request) return;
 
     const doc = new jsPDF();
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+    const formattedTime = `${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}:${currentDate.getSeconds().toString().padStart(2, '0')}`;
     
-    // Header Section
-    doc.setFontSize(16);
+    // Header Section with better spacing
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Shopping Card', 105, 25, { align: 'center' });
     
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text('Sika Moçambique', 105, 32, { align: 'center' });
+    doc.text('Sika Mozambique', 105, 35, { align: 'center' });
     
-    // Document info line
-    doc.setFontSize(8);
-    doc.text(`Document ID: ${request.request_number}`, 20, 50);
-    doc.text(`Generated: ${currentDate} 17:22:07`, 150, 50);
+    // Horizontal line under header
+    doc.line(20, 45, 190, 45);
     
-    // Requestor Information Section
+    // Document info with proper spacing
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Document ID: ${request.request_number}`, 20, 55);
+    doc.text(`Generated: ${formattedDate} ${formattedTime}`, 120, 55);
+    
+    // Two-column layout with gray backgrounds
+    const leftColumnX = 20;
+    const rightColumnX = 110;
+    const sectionY = 70;
+    
+    // Requestor Information Section (left column)
+    doc.setFillColor(240, 240, 240);
+    doc.rect(leftColumnX, sectionY, 85, 8, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('REQUESTOR INFORMATION', 20, 65);
+    doc.setTextColor(0, 0, 0);
+    doc.text('REQUESTOR INFORMATION', leftColumnX + 2, sectionY + 5);
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text('Requested by:', 20, 75);
-    doc.text(request.requester.full_name, 60, 75);
+    doc.text('Requested By:', leftColumnX + 2, sectionY + 15);
+    doc.text(request.requester.full_name, leftColumnX + 35, sectionY + 15);
     
-    doc.text('Cost Center:', 20, 82);
-    doc.text(request.requester.cost_center || 'Not assigned', 60, 82);
+    doc.text('Cost Center:', leftColumnX + 2, sectionY + 22);
+    doc.text(request.requester.cost_center || 'Not assigned', leftColumnX + 35, sectionY + 22);
     
-    doc.text('Request Date:', 20, 89);
-    doc.text(new Date(request.created_at).toLocaleDateString(), 60, 89);
+    doc.text('Request Date:', leftColumnX + 2, sectionY + 29);
+    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT'), leftColumnX + 35, sectionY + 29);
     
-    doc.text('Request Reference:', 20, 96);
-    doc.text(request.request_number, 60, 96);
+    doc.text('Description/Reason:', leftColumnX + 2, sectionY + 36);
+    doc.text(request.justification || 'out of tonner', leftColumnX + 35, sectionY + 36);
     
-    // Movement Details Section
+    // Movement Details Section (right column)
+    doc.setFillColor(240, 240, 240);
+    doc.rect(rightColumnX, sectionY, 75, 8, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('MOVEMENT DETAILS', 120, 65);
+    doc.text('MOVEMENT DETAILS', rightColumnX + 2, sectionY + 5);
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text('Journal Number:', 120, 75);
-    doc.text(request.request_number, 160, 75);
+    doc.text('Journal Number:', rightColumnX + 2, sectionY + 15);
+    doc.text(request.request_number, rightColumnX + 35, sectionY + 15);
     
-    doc.text('Journal Name:', 120, 82);
-    doc.text('Shopping Card', 160, 82);
+    doc.text('Journal Name:', rightColumnX + 2, sectionY + 22);
+    doc.text('Shopping Card', rightColumnX + 35, sectionY + 22);
     
-    doc.text('Request Type:', 120, 89);
-    doc.text(request.request_type, 160, 89);
+    doc.text('Request Type:', rightColumnX + 2, sectionY + 29);
+    doc.text('Shopping Card', rightColumnX + 35, sectionY + 29);
     
-    doc.text('Shopping Card Type:', 120, 96);
-    doc.text(request.request_type, 160, 96);
+    doc.text('Shopping Card Type:', rightColumnX + 2, sectionY + 36);
+    doc.text('Material', rightColumnX + 35, sectionY + 36);
     
     // Item Details Section
+    const itemSectionY = sectionY + 55;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(20, itemSectionY, 170, 8, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('ITEM DETAILS', 20, 115);
+    doc.text('ITEM DETAILS', 22, itemSectionY + 5);
     
-    // Table headers
-    doc.setFontSize(8);
+    // Table headers with proper spacing
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text('ITEM', 20, 125);
-    doc.text('DESCRIPTION', 40, 125);
-    doc.text('QTY', 150, 125);
+    doc.text('ITEM', 25, itemSectionY + 18);
+    doc.text('DESCRIPTION', 60, itemSectionY + 18);
+    doc.text('QTY', 170, itemSectionY + 18);
     
-    // Table line
-    doc.line(20, 127, 190, 127);
+    // Table border lines
+    doc.line(20, itemSectionY + 20, 190, itemSectionY + 20);
     
     // Table content
     doc.setFont('helvetica', 'normal');
-    let yPos = 135;
+    let yPos = itemSectionY + 28;
     
     request.request_items.forEach((item, index) => {
-      doc.text(`${index + 1}.`, 20, yPos);
-      doc.text(item.description, 40, yPos);
-      doc.text(`${item.quantity} ${item.unit}`, 150, yPos);
-      yPos += 7;
+      doc.text(`${index + 1}.`, 25, yPos);
+      doc.text(item.description, 60, yPos);
+      doc.text(`${item.quantity} ${item.unit}`, 170, yPos);
+      yPos += 8;
     });
     
     // Approval Workflow Section
-    yPos += 15;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(20, yPos, 170, 8, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('APPROVAL WORKFLOW', 20, yPos);
+    doc.text('APPROVAL WORKFLOW', 22, yPos + 5);
     
-    yPos += 10;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('REQUESTED BY', 20, yPos);
+    yPos += 18;
     
-    yPos += 7;
-    doc.text(request.requester.full_name, 20, yPos);
-    doc.text(new Date(request.created_at).toLocaleDateString(), 20, yPos + 7);
-    
-    // Submitted status
-    yPos += 20;
+    // Step 1: Requested By
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.text('Submitted', 150, yPos);
+    doc.text('1. REQUESTED BY', 25, yPos);
+    doc.text('•  S u b m i t t e d', 150, yPos);
     
-    // Manager Approval if exists
+    yPos += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.text(request.requester.full_name, 25, yPos);
+    yPos += 6;
+    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT') + ' at ' + new Date(request.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 25, yPos);
+    
+    // Step 2: Manager Approval
+    yPos += 15;
+    doc.setFont('helvetica', 'bold');
+    doc.text('2. MANAGER APPROVAL', 25, yPos);
+    
     if (request.manager_approval && request.manager_approved_at) {
-      yPos += 15;
-      doc.setFontSize(8);
+      doc.text('•  A p p r o v e d', 150, yPos);
+      yPos += 8;
       doc.setFont('helvetica', 'normal');
-      doc.text('MANAGER APPROVAL', 20, yPos);
-      
-      yPos += 7;
-      doc.text(request.manager_approval.full_name, 20, yPos);
-      doc.text(new Date(request.manager_approved_at).toLocaleDateString(), 20, yPos + 7);
-      
-      yPos += 15;
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Approved', 150, yPos);
+      doc.text(request.manager_approval.full_name, 25, yPos);
+      yPos += 6;
+      doc.text(new Date(request.manager_approved_at).toLocaleDateString('pt-PT') + ' at ' + new Date(request.manager_approved_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 25, yPos);
+    } else {
+      doc.text('•  P e n d i n g', 150, yPos);
+      yPos += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.text('Awaiting manager approval', 25, yPos);
     }
     
     // Document Status Section
     yPos += 25;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(20, yPos, 170, 8, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text('DOCUMENT STATUS', 20, yPos);
+    doc.setTextColor(0, 0, 0);
+    doc.text('DOCUMENT STATUS', 22, yPos + 5);
     
-    yPos += 10;
+    yPos += 18;
     doc.setFontSize(12);
-    doc.setTextColor(0, 128, 0); // Green color
-    doc.text(`STATUS: ${request.status.toUpperCase()}`, 20, yPos);
+    doc.setFont('helvetica', 'bold');
     
-    // Footer
-    doc.setTextColor(0, 0, 0); // Reset to black
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text('This document serves as an official authorization for Purchases/Order processing', 105, 280, { align: 'center' });
-    doc.text('Generated by Sika Moçambique Internal Shopping Card', 105, 287, { align: 'center' });
-    doc.text('Page 1 of 1', 180, 287);
+    // Set color based on status
+    if (request.status === 'approved') {
+      doc.setTextColor(0, 128, 0); // Green
+    } else if (request.status === 'rejected') {
+      doc.setTextColor(255, 0, 0); // Red
+    } else {
+      doc.setTextColor(255, 165, 0); // Orange for pending
+    }
+    
+    doc.text(`STATUS: ${request.status.toUpperCase()}`, 25, yPos);
 
     // Save the PDF
     doc.save(`shopping-card-${request.request_number}.pdf`);
