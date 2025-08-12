@@ -280,126 +280,163 @@ export const RequestDetail = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => navigate('/dashboard')}>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="text-muted-foreground hover:text-foreground"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                {request.request_number}
-              </h1>
-              <p className="text-muted-foreground">
-                Created on {new Date(request.created_at).toLocaleDateString()}
-              </p>
+            
+            <div className="flex items-center space-x-3">
+              {canEdit && (
+                <Button size="sm" onClick={() => navigate(`/request/edit/${request.id}`)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              )}
+              {userCanGeneratePDF && (
+                <Button size="sm" variant="outline" onClick={generatePDF}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  PDF
+                </Button>
+              )}
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {getStatusBadge(request.status)}
-            {canEdit && (
-              <Button onClick={() => navigate(`/request/edit/${request.id}`)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            )}
-            {userCanGeneratePDF && (
-              <Button variant="outline" onClick={generatePDF}>
-                <FileText className="h-4 w-4 mr-2" />
-                Generate PDF
-              </Button>
-            )}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3">
+              <h1 className="text-4xl font-bold tracking-tight">
+                {request.request_number}
+              </h1>
+              {getStatusBadge(request.status)}
+            </div>
+            <p className="text-lg text-muted-foreground">
+              Created on {new Date(request.created_at).toLocaleDateString()}
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* General Information */}
-            <Card>
-              <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-                <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                  <FileText className="h-4 w-4 text-primary" />
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-muted/30 border-b">
+                <div className="flex items-center space-x-3">
+                  <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Request Information</CardTitle>
+                    <p className="text-sm text-muted-foreground">Basic details and specifications</p>
+                  </div>
                 </div>
-                <CardTitle>General Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <div className="text-sm text-muted-foreground">Journal Name</div>
-                    <div className="font-medium">{request.request_type}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm text-muted-foreground">Date</div>
-                    <div className="font-medium">{new Date(request.created_at).toLocaleDateString()}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm text-muted-foreground">Request Type</div>
-                    <div className="font-medium">{request.request_type}</div>
-                  </div>
-                  {request.delivery_date && (
+              <CardContent className="p-6">
+                <div className="grid gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <div className="text-sm text-muted-foreground">Delivery Date</div>
-                      <div className="font-medium">{new Date(request.delivery_date).toLocaleDateString()}</div>
+                      <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Request Type</div>
+                      <div className="text-lg font-semibold">{request.request_type}</div>
                     </div>
-                  )}
-                  {request.preferred_supplier && (
                     <div className="space-y-1">
-                      <div className="text-sm text-muted-foreground">Preferred Supplier</div>
-                      <div className="font-medium">{request.preferred_supplier}</div>
+                      <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Created Date</div>
+                      <div className="text-lg font-semibold">{new Date(request.created_at).toLocaleDateString()}</div>
                     </div>
-                  )}
-                  {request.client_name && (
-                    <div className="space-y-1">
-                      <div className="text-sm text-muted-foreground">Client Name</div>
-                      <div className="font-medium">{request.client_name}</div>
+                    {request.delivery_date && (
+                      <div className="space-y-1">
+                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Delivery Date</div>
+                        <div className="text-lg font-semibold">{new Date(request.delivery_date).toLocaleDateString()}</div>
+                      </div>
+                    )}
+                    {request.preferred_supplier && (
+                      <div className="space-y-1">
+                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Preferred Supplier</div>
+                        <div className="text-lg font-semibold">{request.preferred_supplier}</div>
+                      </div>
+                    )}
+                    {request.client_name && (
+                      <div className="space-y-1">
+                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Client Name</div>
+                        <div className="text-lg font-semibold">{request.client_name}</div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {request.justification && (
+                    <div className="pt-4 border-t">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Justification</div>
+                        <div className="text-base leading-relaxed bg-muted/30 p-4 rounded-lg">
+                          {request.justification}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
-                
-                {request.justification && (
-                  <div className="space-y-1">
-                    <div className="text-sm text-muted-foreground">Reason</div>
-                    <div className="font-medium">{request.justification}</div>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
             {/* Items Section */}
-            <Card>
-              <CardHeader className="flex flex-row items-center space-y-0 pb-4">
-                <div className="h-8 w-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                  <div className="h-4 w-4 bg-primary rounded-sm" />
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-muted/30 border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <div className="h-5 w-5 bg-primary rounded-md" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Items Requested</CardTitle>
+                      <p className="text-sm text-muted-foreground">{request.request_items.length} item{request.request_items.length !== 1 ? 's' : ''} total</p>
+                    </div>
+                  </div>
                 </div>
-                <CardTitle>Items ({request.request_items.length})</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
+              <CardContent className="p-0">
+                <div className="divide-y">
                   {request.request_items.map((item, index) => (
-                    <div key={index} className="border-b pb-6 last:border-b-0 last:pb-0">
-                      <div className="font-medium text-lg mb-3">Item {index + 1}</div>
-                      <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div className="space-y-1">
-                          <div className="text-muted-foreground">Code</div>
-                          <div className="font-medium">{item.item_code}</div>
+                    <div key={index} className="p-6 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-foreground mb-1">
+                            {item.description}
+                          </h3>
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                            <span className="font-mono bg-muted px-2 py-1 rounded text-xs">
+                              {item.item_code}
+                            </span>
+                            <span className="font-medium">
+                              {item.quantity} {item.unit}
+                            </span>
+                            {item.supplier && (
+                              <span className="text-primary">
+                                {item.supplier}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <div className="text-muted-foreground">Description</div>
-                          <div className="font-medium">{item.description}</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-muted-foreground">Quantity</div>
-                          <div className="font-medium">{item.quantity} {item.unit}</div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-muted-foreground">Type</div>
-                          <div className="font-medium">{item.supplier || 'Standard'}</div>
-                        </div>
+                        {(item.unit_price || item.total_price) && (
+                          <div className="text-right ml-4">
+                            {item.unit_price && (
+                              <div className="text-sm text-muted-foreground">
+                                ${item.unit_price}/{item.unit}
+                              </div>
+                            )}
+                            {item.total_price && (
+                              <div className="font-semibold text-lg">
+                                ${item.total_price}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
+                      
                       {item.notes && (
-                        <div className="mt-3 space-y-1">
-                          <div className="text-muted-foreground text-sm">Notes</div>
+                        <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="text-sm text-muted-foreground mb-1">Notes</div>
                           <div className="text-sm">{item.notes}</div>
                         </div>
                       )}
@@ -408,9 +445,12 @@ export const RequestDetail = () => {
                 </div>
                 
                 {request.total_amount && request.total_amount > 0 && (
-                  <div className="border-t pt-4 mt-4">
-                    <div className="text-lg font-semibold text-right">
-                      Total Amount: ${request.total_amount}
+                  <div className="border-t bg-muted/30 p-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-medium">Total Amount</span>
+                      <span className="text-2xl font-bold text-primary">
+                        ${request.total_amount}
+                      </span>
                     </div>
                   </div>
                 )}
