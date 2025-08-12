@@ -202,5 +202,5 @@ export const canManage = (userRole: string): boolean => {
 };
 
 export const canGeneratePDF = (userRole: string): boolean => {
-  return userRole === 'procurement';
+  return userRole === 'procurement' || userRole === 'manager' || userRole === 'admin';
 };

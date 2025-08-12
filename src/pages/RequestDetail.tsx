@@ -292,13 +292,34 @@ export const RequestDetail = () => {
             </span>
           </div>
           
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
-            className="text-gray-600 hover:text-gray-900 text-lg font-medium"
-          >
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center space-x-3">
+            {canEdit && (
+              <Button 
+                onClick={() => navigate(`/request/edit/${request.id}`)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+            {userCanGeneratePDF && (
+              <Button 
+                variant="outline" 
+                onClick={generatePDF}
+                className="border-gray-300 hover:bg-gray-50"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Generate PDF
+              </Button>
+            )}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="text-gray-600 hover:text-gray-900 text-lg font-medium"
+            >
+              Back to Dashboard
+            </Button>
+          </div>
         </div>
 
         {/* Main Content Grid */}
