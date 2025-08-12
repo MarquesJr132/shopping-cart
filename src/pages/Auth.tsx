@@ -116,7 +116,7 @@ export const Auth = () => {
           email: signupData.email,
           full_name: signupData.fullName,
           role: signupData.role,
-          manager_id: signupData.managerId || null
+          manager_id: signupData.managerId === "none" ? null : signupData.managerId || null
         });
 
         toast({
@@ -234,7 +234,7 @@ export const Auth = () => {
                         <SelectValue placeholder="Select manager" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No Manager</SelectItem>
+                        <SelectItem value="none">No Manager</SelectItem>
                         {profiles.map((profile) => (
                           <SelectItem key={profile.id} value={profile.id}>
                             {profile.full_name} ({profile.role})
