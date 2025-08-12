@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
@@ -30,6 +31,7 @@ export const RequestForm = () => {
   const { toast } = useToast();
   const { profile } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [expandedItem, setExpandedItem] = useState<string>("item-0");
   const [items, setItems] = useState<RequestItem[]>([
     { description: "", quantity: 1, unit: "Unit" }
   ]);
@@ -84,7 +86,9 @@ export const RequestForm = () => {
   };
 
   const addItem = () => {
+    const newIndex = items.length;
     setItems([...items, { description: "", quantity: 1, unit: "Unit" }]);
+    setExpandedItem(`item-${newIndex}`);
   };
 
   const removeItem = (index: number) => {
@@ -342,112 +346,136 @@ export const RequestForm = () => {
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {items.map((item, index) => (
-                    <div key={index} className="border rounded-lg p-3 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium text-sm">Item {index + 1}</h4>
-                        {items.length > 1 && (
-                          <Button
-                            type="button"
-                            onClick={() => removeItem(index)}
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                  <Accordion 
+                    type="single" 
+                    collapsible 
+                    value={expandedItem} 
+                    onValueChange={setExpandedItem}
+                    className="space-y-2"
+                  >
+                    {items.map((item, index) => (
+                      <AccordionItem key={index} value={`item-${index}`} className="border rounded-lg">
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                          <div className="flex justify-between items-center w-full mr-4">
+                            <div className="text-left">
+                              <span className="font-medium text-sm">Item {index + 1}</span>
+                              {item.description && (
+                                <span className="ml-2 text-muted-foreground text-sm">
+                                  - {item.description}
+                                </span>
+                              )}
+                            </div>
+                            {items.length > 1 && (
+                              <Button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeItem(index);
+                                }}
+                                variant="outline"
+                                size="sm"
+                                className="ml-2"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4">
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <div className="space-y-1">
+                                <Label className="text-xs">Description</Label>
+                                <Input
+                                  value={item.description}
+                                  onChange={(e) => updateItem(index, 'description', e.target.value)}
+                                  placeholder="Item description"
+                                  className="h-8 text-sm"
+                                  required
+                                />
+                              </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs">Description</Label>
-                          <Input
-                            value={item.description}
-                            onChange={(e) => updateItem(index, 'description', e.target.value)}
-                            placeholder="Item description"
-                            className="h-8 text-sm"
-                            required
-                          />
-                        </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Quantity</Label>
+                                <Input
+                                  type="number"
+                                  min="0.01"
+                                  step="0.01"
+                                  value={item.quantity}
+                                  onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                  className="h-8 text-sm"
+                                  required
+                                />
+                              </div>
 
-                        <div className="space-y-1">
-                          <Label className="text-xs">Quantity</Label>
-                          <Input
-                            type="number"
-                            min="0.01"
-                            step="0.01"
-                            value={item.quantity}
-                            onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                            className="h-8 text-sm"
-                            required
-                          />
-                        </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Unit</Label>
+                                <Select 
+                                  value={item.unit} 
+                                  onValueChange={(value) => updateItem(index, 'unit', value)}
+                                >
+                                  <SelectTrigger className="h-8 text-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Unit">Unit</SelectItem>
+                                    <SelectItem value="Kg">Kg</SelectItem>
+                                    <SelectItem value="Liter">Liter</SelectItem>
+                                    <SelectItem value="Piece">Piece</SelectItem>
+                                    <SelectItem value="Box">Box</SelectItem>
+                                    <SelectItem value="Meter">Meter</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
 
-                        <div className="space-y-1">
-                          <Label className="text-xs">Unit</Label>
-                          <Select 
-                            value={item.unit} 
-                            onValueChange={(value) => updateItem(index, 'unit', value)}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Unit">Unit</SelectItem>
-                              <SelectItem value="Kg">Kg</SelectItem>
-                              <SelectItem value="Liter">Liter</SelectItem>
-                              <SelectItem value="Piece">Piece</SelectItem>
-                              <SelectItem value="Box">Box</SelectItem>
-                              <SelectItem value="Meter">Meter</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Unit Price</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={item.unit_price || ''}
+                                  onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || undefined)}
+                                  placeholder="Optional"
+                                  className="h-8 text-sm"
+                                />
+                              </div>
+                            </div>
 
-                        <div className="space-y-1">
-                          <Label className="text-xs">Unit Price</Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unit_price || ''}
-                            onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || undefined)}
-                            placeholder="Optional"
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                      </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <Label className="text-xs">Supplier</Label>
+                                <Input
+                                  value={item.supplier || ''}
+                                  onChange={(e) => updateItem(index, 'supplier', e.target.value)}
+                                  placeholder="Optional"
+                                  className="h-8 text-sm"
+                                />
+                              </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs">Supplier</Label>
-                          <Input
-                            value={item.supplier || ''}
-                            onChange={(e) => updateItem(index, 'supplier', e.target.value)}
-                            placeholder="Optional"
-                            className="h-8 text-sm"
-                          />
-                        </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Notes</Label>
+                                <Input
+                                  value={item.notes || ''}
+                                  onChange={(e) => updateItem(index, 'notes', e.target.value)}
+                                  placeholder="Additional notes..."
+                                  className="h-8 text-sm"
+                                />
+                              </div>
+                            </div>
 
-                        <div className="space-y-1">
-                          <Label className="text-xs">Notes</Label>
-                          <Input
-                            value={item.notes || ''}
-                            onChange={(e) => updateItem(index, 'notes', e.target.value)}
-                            placeholder="Additional notes..."
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      {item.unit_price && (
-                        <div className="flex justify-end">
-                          <Badge variant="secondary" className="text-xs">
-                            Total: ${(item.quantity * item.unit_price).toFixed(2)}
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                            {item.unit_price && (
+                              <div className="flex justify-end">
+                                <Badge variant="secondary" className="text-xs">
+                                  Total: ${(item.quantity * item.unit_price).toFixed(2)}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
 
                   {calculateTotal() > 0 && (
                     <div className="border-t pt-4 flex justify-end">
