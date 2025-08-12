@@ -1,23 +1,20 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUser } from "@/lib/auth";
-import { initializeSampleData } from "@/lib/sampleData";
+import { useAuth } from "@/components/AuthProvider";
 
 export const Index = () => {
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    // Initialize sample data
-    initializeSampleData();
-    
-    // Redirect based on authentication status
-    if (user) {
-      navigate('/dashboard', { replace: true });
-    } else {
-      navigate('/login', { replace: true });
+    if (!loading) {
+      if (user) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        navigate('/auth', { replace: true });
+      }
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

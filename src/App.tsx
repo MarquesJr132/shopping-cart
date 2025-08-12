@@ -4,60 +4,63 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Index } from "./pages/Index";
-import { Login } from "./pages/Login";
+import { Auth } from "./pages/Auth";
 import { Dashboard } from "./pages/Dashboard";
 import { Reports } from "./pages/Reports";
-import { MovementForm } from "./pages/MovementForm";
-import { MovementDetail } from "./pages/MovementDetail";
+import { RequestForm } from "./pages/RequestForm";
+import { RequestDetail } from "./pages/RequestDetail";
 import { Admin } from "./pages/Admin";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AuthProvider } from "./components/AuthProvider";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/reports" element={
-            <ProtectedRoute>
-              <Reports />
-            </ProtectedRoute>
-          } />
-          <Route path="/movement/new" element={
-            <ProtectedRoute>
-              <MovementForm />
-            </ProtectedRoute>
-          } />
-          <Route path="/movement/edit/:id" element={
-            <ProtectedRoute>
-              <MovementForm />
-            </ProtectedRoute>
-          } />
-          <Route path="/movement/:id" element={
-            <ProtectedRoute>
-              <MovementDetail />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          } />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            } />
+            <Route path="/request/new" element={
+              <ProtectedRoute>
+                <RequestForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/request/edit/:id" element={
+              <ProtectedRoute>
+                <RequestForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/request/:id" element={
+              <ProtectedRoute>
+                <RequestDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
