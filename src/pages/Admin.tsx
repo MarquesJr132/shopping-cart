@@ -29,12 +29,14 @@ export const Admin = () => {
     password: string;
     role: 'user' | 'manager' | 'admin' | 'procurement';
     manager_id: string;
+    cost_center: string;
   }>({
     email: '',
     full_name: '',
     password: '',
     role: 'user',
-    manager_id: ''
+    manager_id: '',
+    cost_center: ''
   });
 
   useEffect(() => {
@@ -65,7 +67,8 @@ export const Admin = () => {
       full_name: '',
       password: '',
       role: 'user',
-      manager_id: ''
+      manager_id: '',
+      cost_center: ''
     });
     setEditingProfile(null);
   };
@@ -82,7 +85,8 @@ export const Admin = () => {
       full_name: userToEdit.full_name,
       password: '', // Don't pre-fill password for security
       role: userToEdit.role,
-      manager_id: userToEdit.manager_id || ''
+      manager_id: userToEdit.manager_id || '',
+      cost_center: userToEdit.cost_center || ''
     });
     setIsDialogOpen(true);
   };
@@ -114,7 +118,8 @@ export const Admin = () => {
           email: formData.email,
           full_name: formData.full_name,
           role: formData.role,
-          manager_id: formData.manager_id || null
+          manager_id: formData.manager_id || null,
+          cost_center: formData.cost_center || null
         });
         toast({
           title: "User updated",
@@ -128,7 +133,8 @@ export const Admin = () => {
             password: formData.password,
             full_name: formData.full_name,
             role: formData.role,
-            manager_id: formData.manager_id || undefined
+            manager_id: formData.manager_id || undefined,
+            cost_center: formData.cost_center || undefined
           }
         })
 
@@ -318,6 +324,16 @@ export const Admin = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="cost_center" className="text-right">Cost Center</Label>
+                  <Input
+                    id="cost_center"
+                    value={formData.cost_center}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cost_center: e.target.value }))}
+                    className="col-span-3"
+                    placeholder="Cost center code"
+                  />
+                </div>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -359,6 +375,7 @@ export const Admin = () => {
                     <p className="text-sm text-muted-foreground">{userProfile.email}</p>
                     <div className="flex items-center space-x-4 text-xs text-muted-foreground mt-1">
                       <span>Manager: {getManagerName(userProfile.manager_id)}</span>
+                      <span>Cost Center: {userProfile.cost_center || 'Not assigned'}</span>
                     </div>
                   </div>
                   <div className="flex space-x-2">

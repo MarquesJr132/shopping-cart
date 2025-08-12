@@ -196,55 +196,149 @@ export const RequestDetail = () => {
     if (!request) return;
 
     const doc = new jsPDF();
+    const currentDate = new Date().toLocaleDateString();
     
-    // Header
-    doc.setFontSize(20);
-    doc.text('Shopping Request', 20, 30);
+    // Header Section
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Shopping Card', 105, 25, { align: 'center' });
     
-    // Request details
-    doc.setFontSize(12);
-    doc.text(`Request Number: ${request.request_number}`, 20, 50);
-    doc.text(`Request Type: ${request.request_type}`, 20, 60);
-    doc.text(`Requester: ${request.requester.full_name}`, 20, 70);
-    doc.text(`Status: ${request.status}`, 20, 80);
-    doc.text(`Created: ${new Date(request.created_at).toLocaleDateString()}`, 20, 90);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Sika Moçambique', 105, 32, { align: 'center' });
     
-    if (request.delivery_date) {
-      doc.text(`Delivery Date: ${new Date(request.delivery_date).toLocaleDateString()}`, 20, 100);
-    }
+    // Document info line
+    doc.setFontSize(8);
+    doc.text(`Document ID: ${request.request_number}`, 20, 50);
+    doc.text(`Generated: ${currentDate} 17:22:07`, 150, 50);
     
-    if (request.preferred_supplier) {
-      doc.text(`Preferred Supplier: ${request.preferred_supplier}`, 20, 110);
-    }
-
-    // Items
-    doc.text('Items:', 20, 130);
-    let yPos = 140;
+    // Requestor Information Section
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('REQUESTOR INFORMATION', 20, 65);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Requested by:', 20, 75);
+    doc.text(request.requester.full_name, 60, 75);
+    
+    doc.text('Cost Center:', 20, 82);
+    doc.text(request.requester.cost_center || 'Not assigned', 60, 82);
+    
+    doc.text('Request Date:', 20, 89);
+    doc.text(new Date(request.created_at).toLocaleDateString(), 60, 89);
+    
+    doc.text('Request Reference:', 20, 96);
+    doc.text(request.request_number, 60, 96);
+    
+    // Movement Details Section
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('MOVEMENT DETAILS', 120, 65);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Journal Number:', 120, 75);
+    doc.text(request.request_number, 160, 75);
+    
+    doc.text('Journal Name:', 120, 82);
+    doc.text('Shopping Card', 160, 82);
+    
+    doc.text('Request Type:', 120, 89);
+    doc.text(request.request_type, 160, 89);
+    
+    doc.text('Shopping Card Type:', 120, 96);
+    doc.text(request.request_type, 160, 96);
+    
+    // Item Details Section
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ITEM DETAILS', 20, 115);
+    
+    // Table headers
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ITEM', 20, 125);
+    doc.text('DESCRIPTION', 40, 125);
+    doc.text('QTY', 150, 125);
+    
+    // Table line
+    doc.line(20, 127, 190, 127);
+    
+    // Table content
+    doc.setFont('helvetica', 'normal');
+    let yPos = 135;
     
     request.request_items.forEach((item, index) => {
-      doc.text(`${index + 1}. ${item.description}`, 25, yPos);
-      doc.text(`   Code: ${item.item_code}`, 25, yPos + 10);
-      doc.text(`   Quantity: ${item.quantity} ${item.unit}`, 25, yPos + 20);
-      if (item.unit_price) {
-        doc.text(`   Unit Price: $${item.unit_price}`, 25, yPos + 30);
-        doc.text(`   Total: $${item.total_price}`, 25, yPos + 40);
-        yPos += 50;
-      } else {
-        yPos += 30;
-      }
+      doc.text(`${index + 1}.`, 20, yPos);
+      doc.text(item.description, 40, yPos);
+      doc.text(`${item.quantity} ${item.unit}`, 150, yPos);
+      yPos += 7;
     });
-
-    if (request.total_amount && request.total_amount > 0) {
-      yPos += 10;
-      doc.text(`Total Amount: $${request.total_amount}`, 20, yPos);
+    
+    // Approval Workflow Section
+    yPos += 15;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('APPROVAL WORKFLOW', 20, yPos);
+    
+    yPos += 10;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('REQUESTED BY', 20, yPos);
+    
+    yPos += 7;
+    doc.text(request.requester.full_name, 20, yPos);
+    doc.text(new Date(request.created_at).toLocaleDateString(), 20, yPos + 7);
+    
+    // Submitted status
+    yPos += 20;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Submitted', 150, yPos);
+    
+    // Manager Approval if exists
+    if (request.manager_approval && request.manager_approved_at) {
+      yPos += 15;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.text('MANAGER APPROVAL', 20, yPos);
+      
+      yPos += 7;
+      doc.text(request.manager_approval.full_name, 20, yPos);
+      doc.text(new Date(request.manager_approved_at).toLocaleDateString(), 20, yPos + 7);
+      
+      yPos += 15;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Approved', 150, yPos);
     }
+    
+    // Document Status Section
+    yPos += 25;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DOCUMENT STATUS', 20, yPos);
+    
+    yPos += 10;
+    doc.setFontSize(12);
+    doc.setTextColor(0, 128, 0); // Green color
+    doc.text(`STATUS: ${request.status.toUpperCase()}`, 20, yPos);
+    
+    // Footer
+    doc.setTextColor(0, 0, 0); // Reset to black
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('This document serves as an official authorization for Purchases/Order processing', 105, 280, { align: 'center' });
+    doc.text('Generated by Sika Moçambique Internal Shopping Card', 105, 287, { align: 'center' });
+    doc.text('Page 1 of 1', 180, 287);
 
     // Save the PDF
-    doc.save(`shopping-request-${request.request_number}.pdf`);
+    doc.save(`shopping-card-${request.request_number}.pdf`);
     
     toast({
       title: "Success",
-      description: "PDF generated successfully.",
+      description: "Shopping Card PDF generated successfully.",
     });
   };
 

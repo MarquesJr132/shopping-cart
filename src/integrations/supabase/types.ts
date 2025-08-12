@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          cost_center: string | null
           created_at: string
           email: string
           full_name: string
@@ -26,6 +27,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cost_center?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -36,6 +38,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cost_center?: string | null
           created_at?: string
           email?: string
           full_name?: string
