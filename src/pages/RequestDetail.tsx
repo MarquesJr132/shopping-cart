@@ -418,13 +418,13 @@ export const RequestDetail = () => {
               </div>
             </div>
 
-            {/* Actions Card for mobile */}
+            {/* Actions Card for mobile only */}
             {(userCanApprove || userCanManage) && request.status !== 'completed' && request.status !== 'rejected' && (
-              <Card className="lg:hidden bg-white shadow-sm border border-gray-200">
-                <CardHeader className="border-b border-gray-100">
-                  <CardTitle className="text-lg font-semibold text-gray-900">Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 space-y-4">
+              <div className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900">Actions</h3>
+                </div>
+                <div className="p-6 space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="comments-mobile" className="text-sm font-medium text-gray-700">Comments</Label>
                     <Textarea
@@ -482,8 +482,8 @@ export const RequestDetail = () => {
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
 
