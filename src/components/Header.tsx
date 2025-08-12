@@ -1,20 +1,20 @@
 import { LogOut, User, BarChart3, Home, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, logout, isAdmin } from "@/lib/auth";
+import { useAuth } from "@/components/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { NotificationCenter } from "@/components/NotificationCenter";
+
 import sikaLogo from "@/assets/sika-logo.png";
 
 export const Header = () => {
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { profile, signOut } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth', { replace: true });
   };
 
-  if (!user) return null;
+  if (!profile) return null;
 
   return (
     <header className="bg-primary text-primary-foreground shadow-lg">
@@ -27,7 +27,7 @@ export const Header = () => {
               className="h-12 w-auto bg-white p-2 rounded"
             />
             <div>
-              <h1 className="text-xl font-bold">Internal Requisition Management System</h1>
+              <h1 className="text-xl font-bold">Internal Shopping cart</h1>
               <p className="text-primary-foreground/80 text-sm">Sika Mozambique</p>
             </div>
           </div>
@@ -43,17 +43,8 @@ export const Header = () => {
               Dashboard
             </Button>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/reports')}
-              className="hidden md:flex bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Reports
-            </Button>
 
-            {isAdmin(user.id) && (
+            {profile.role === 'admin' && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -65,13 +56,13 @@ export const Header = () => {
               </Button>
             )}
 
-            <NotificationCenter />
+            
 
             <div className="flex items-center space-x-2">
               <User className="h-4 w-4" />
-              <span className="text-sm">{user.name}</span>
+              <span className="text-sm">{profile.full_name}</span>
               <span className="text-xs bg-primary-foreground/20 px-2 py-1 rounded">
-                {user.role.replace('_', ' ').toUpperCase()}
+                {profile.role.replace('_', ' ').toUpperCase()}
               </span>
             </div>
             <Button 

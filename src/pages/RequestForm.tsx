@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
@@ -14,7 +15,6 @@ import { Trash2, Plus } from "lucide-react";
 import { createShoppingRequest, getShoppingRequestById, updateShoppingRequest, addRequestItems, deleteRequestItems } from "@/lib/supabase";
 
 interface RequestItem {
-  item_code: string;
   description: string;
   quantity: number;
   unit: string;
@@ -31,7 +31,7 @@ export const RequestForm = () => {
   const { profile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<RequestItem[]>([
-    { item_code: "", description: "", quantity: 1, unit: "Unit" }
+    { description: "", quantity: 1, unit: "Unit" }
   ]);
 
   const [formData, setFormData] = useState({
@@ -65,7 +65,6 @@ export const RequestForm = () => {
       
       if (request.request_items && request.request_items.length > 0) {
         setItems(request.request_items.map(item => ({
-          item_code: item.item_code,
           description: item.description,
           quantity: Number(item.quantity),
           unit: item.unit,
@@ -85,7 +84,7 @@ export const RequestForm = () => {
   };
 
   const addItem = () => {
-    setItems([...items, { item_code: "", description: "", quantity: 1, unit: "Unit" }]);
+    setItems([...items, { description: "", quantity: 1, unit: "Unit" }]);
   };
 
   const removeItem = (index: number) => {
@@ -138,8 +137,8 @@ export const RequestForm = () => {
       }
 
       // Add items
-      const itemsData = items.filter(item => item.item_code && item.description).map(item => ({
-        item_code: item.item_code,
+      const itemsData = items.filter(item => item.description).map(item => ({
+        item_code: `AUTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Auto-generated item code
         description: item.description,
         quantity: item.quantity,
         unit: item.unit,
@@ -199,8 +198,8 @@ export const RequestForm = () => {
         requestId = newRequest.id;
       }
 
-      const itemsData = items.filter(item => item.item_code && item.description).map(item => ({
-        item_code: item.item_code,
+      const itemsData = items.filter(item => item.description).map(item => ({
+        item_code: `AUTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Auto-generated item code
         description: item.description,
         quantity: item.quantity,
         unit: item.unit,
@@ -249,211 +248,212 @@ export const RequestForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Request Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="request_type">Request Type</Label>
-                  <Select 
-                    value={formData.request_type} 
-                    onValueChange={(value) => setFormData({ ...formData, request_type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="service">Service</SelectItem>
-                      <SelectItem value="material">Material</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="delivery_date">Delivery Date</Label>
-                  <Input
-                    id="delivery_date"
-                    type="date"
-                    value={formData.delivery_date}
-                    onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="preferred_supplier">Preferred Supplier</Label>
-                  <Input
-                    id="preferred_supplier"
-                    value={formData.preferred_supplier}
-                    onChange={(e) => setFormData({ ...formData, preferred_supplier: e.target.value })}
-                    placeholder="Optional"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="client_name">Client Name</Label>
-                  <Input
-                    id="client_name"
-                    value={formData.client_name}
-                    onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                    placeholder="Optional"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="client_id">Client ID</Label>
-                  <Input
-                    id="client_id"
-                    value={formData.client_id}
-                    onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                    placeholder="Optional"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="justification">Justification</Label>
-                <Textarea
-                  id="justification"
-                  value={formData.justification}
-                  onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
-                  placeholder="Explain the business need for this request..."
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Request Items</CardTitle>
-              <Button type="button" onClick={addItem} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Item
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {items.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Item {index + 1}</h4>
-                    {items.length > 1 && (
-                      <Button
-                        type="button"
-                        onClick={() => removeItem(index)}
-                        variant="outline"
-                        size="sm"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Tabs defaultValue="general" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="general">General Info</TabsTrigger>
+              <TabsTrigger value="items">Items</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="general" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>General Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Item Code</Label>
-                      <Input
-                        value={item.item_code}
-                        onChange={(e) => updateItem(index, 'item_code', e.target.value)}
-                        placeholder="SKU/Code"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Input
-                        value={item.description}
-                        onChange={(e) => updateItem(index, 'description', e.target.value)}
-                        placeholder="Item description"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Quantity</Label>
-                      <Input
-                        type="number"
-                        min="0.01"
-                        step="0.01"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Unit</Label>
+                      <Label htmlFor="request_type">Request Type</Label>
                       <Select 
-                        value={item.unit} 
-                        onValueChange={(value) => updateItem(index, 'unit', value)}
+                        value={formData.request_type} 
+                        onValueChange={(value) => setFormData({ ...formData, request_type: value })}
                       >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Unit">Unit</SelectItem>
-                          <SelectItem value="Kg">Kg</SelectItem>
-                          <SelectItem value="Liter">Liter</SelectItem>
-                          <SelectItem value="Piece">Piece</SelectItem>
-                          <SelectItem value="Box">Box</SelectItem>
-                          <SelectItem value="Meter">Meter</SelectItem>
+                          <SelectItem value="service">Service</SelectItem>
+                          <SelectItem value="material">Material</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Unit Price</Label>
+                      <Label htmlFor="delivery_date">Delivery Date</Label>
                       <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={item.unit_price || ''}
-                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || undefined)}
+                        id="delivery_date"
+                        type="date"
+                        value={formData.delivery_date}
+                        onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="preferred_supplier">Preferred Supplier</Label>
+                      <Input
+                        id="preferred_supplier"
+                        value={formData.preferred_supplier}
+                        onChange={(e) => setFormData({ ...formData, preferred_supplier: e.target.value })}
                         placeholder="Optional"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Supplier</Label>
+                      <Label htmlFor="client_name">Client Name</Label>
                       <Input
-                        value={item.supplier || ''}
-                        onChange={(e) => updateItem(index, 'supplier', e.target.value)}
+                        id="client_name"
+                        value={formData.client_name}
+                        onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+                        placeholder="Optional"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="client_id">Client ID</Label>
+                      <Input
+                        id="client_id"
+                        value={formData.client_id}
+                        onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
                         placeholder="Optional"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Notes</Label>
+                    <Label htmlFor="justification">Justification</Label>
                     <Textarea
-                      value={item.notes || ''}
-                      onChange={(e) => updateItem(index, 'notes', e.target.value)}
-                      placeholder="Additional notes for this item..."
-                      rows={2}
+                      id="justification"
+                      value={formData.justification}
+                      onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
+                      placeholder="Explain the business need for this request..."
+                      rows={3}
                     />
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  {item.unit_price && (
-                    <div className="flex justify-end">
-                      <Badge variant="secondary">
-                        Total: ${(item.quantity * item.unit_price).toFixed(2)}
-                      </Badge>
+            <TabsContent value="items" className="space-y-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Request Items</CardTitle>
+                  <Button type="button" onClick={addItem} variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Item
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {items.map((item, index) => (
+                    <div key={index} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h4 className="font-medium">Item {index + 1}</h4>
+                        {items.length > 1 && (
+                          <Button
+                            type="button"
+                            onClick={() => removeItem(index)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Description</Label>
+                          <Input
+                            value={item.description}
+                            onChange={(e) => updateItem(index, 'description', e.target.value)}
+                            placeholder="Item description"
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Quantity</Label>
+                          <Input
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            value={item.quantity}
+                            onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Unit</Label>
+                          <Select 
+                            value={item.unit} 
+                            onValueChange={(value) => updateItem(index, 'unit', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Unit">Unit</SelectItem>
+                              <SelectItem value="Kg">Kg</SelectItem>
+                              <SelectItem value="Liter">Liter</SelectItem>
+                              <SelectItem value="Piece">Piece</SelectItem>
+                              <SelectItem value="Box">Box</SelectItem>
+                              <SelectItem value="Meter">Meter</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Unit Price</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.unit_price || ''}
+                            onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || undefined)}
+                            placeholder="Optional"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Supplier</Label>
+                          <Input
+                            value={item.supplier || ''}
+                            onChange={(e) => updateItem(index, 'supplier', e.target.value)}
+                            placeholder="Optional"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Notes</Label>
+                        <Textarea
+                          value={item.notes || ''}
+                          onChange={(e) => updateItem(index, 'notes', e.target.value)}
+                          placeholder="Additional notes for this item..."
+                          rows={2}
+                        />
+                      </div>
+
+                      {item.unit_price && (
+                        <div className="flex justify-end">
+                          <Badge variant="secondary">
+                            Total: ${(item.quantity * item.unit_price).toFixed(2)}
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {calculateTotal() > 0 && (
+                    <div className="border-t pt-4 flex justify-end">
+                      <div className="text-lg font-semibold">
+                        Request Total: ${calculateTotal().toFixed(2)}
+                      </div>
                     </div>
                   )}
-                </div>
-              ))}
-
-              {calculateTotal() > 0 && (
-                <div className="border-t pt-4 flex justify-end">
-                  <div className="text-lg font-semibold">
-                    Request Total: ${calculateTotal().toFixed(2)}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
           <div className="flex space-x-4">
             <Button type="submit" disabled={loading}>

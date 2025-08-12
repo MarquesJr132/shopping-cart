@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Index } from "./pages/Index";
 import { Auth } from "./pages/Auth";
 import { Dashboard } from "./pages/Dashboard";
-import { Reports } from "./pages/Reports";
+
 import { RequestForm } from "./pages/RequestForm";
 import { RequestDetail } from "./pages/RequestDetail";
 import { Admin } from "./pages/Admin";
@@ -29,11 +29,6 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/reports" element={
-              <ProtectedRoute>
-                <Reports />
               </ProtectedRoute>
             } />
             <Route path="/request/new" element={

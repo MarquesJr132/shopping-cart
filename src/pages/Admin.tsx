@@ -9,71 +9,82 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Edit, Trash2, Users } from "lucide-react";
 import { Header } from "@/components/Header";
-import { getCurrentUser, isAdmin, getAllUsers, saveUser, deleteUser, User } from "@/lib/auth";
+import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
+import { getAllProfiles, updateProfile, createProfile } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
+import type { Profile } from "@/lib/supabase";
 
 export const Admin = () => {
   const navigate = useNavigate();
-  const user = getCurrentUser();
+  const { profile } = useAuth();
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
-    id: '',
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<{
+    email: string;
+    full_name: string;
+    role: 'user' | 'manager' | 'admin' | 'procurement';
+    manager_id: string;
+  }>({
     email: '',
-    name: '',
-    role: 'requester' as User['role'],
-    costCenter: '',
-    managerId: ''
+    full_name: '',
+    role: 'user',
+    manager_id: ''
   });
 
   useEffect(() => {
-    if (!user || !isAdmin(user.id)) {
+    if (!profile || profile.role !== 'admin') {
       navigate('/dashboard');
       return;
     }
-    loadUsers();
-  }, [user, navigate]);
+    loadProfiles();
+  }, [profile, navigate]);
 
-  const loadUsers = () => {
-    const allUsers = getAllUsers();
-    setUsers(allUsers);
+  const loadProfiles = async () => {
+    try {
+      const data = await getAllProfiles();
+      setProfiles(data);
+    } catch (error) {
+      console.error('Error loading profiles:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load users.",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetForm = () => {
     setFormData({
-      id: '',
       email: '',
-      name: '',
-      role: 'requester',
-      costCenter: '',
-      managerId: ''
+      full_name: '',
+      role: 'user',
+      manager_id: ''
     });
-    setEditingUser(null);
+    setEditingProfile(null);
   };
 
   const openCreateDialog = () => {
     resetForm();
-    setFormData(prev => ({ ...prev, id: Date.now().toString() }));
     setIsDialogOpen(true);
   };
 
-  const openEditDialog = (userToEdit: User) => {
-    setEditingUser(userToEdit);
+  const openEditDialog = (userToEdit: Profile) => {
+    setEditingProfile(userToEdit);
     setFormData({
-      id: userToEdit.id,
       email: userToEdit.email,
-      name: userToEdit.name,
+      full_name: userToEdit.full_name,
       role: userToEdit.role,
-      costCenter: userToEdit.costCenter,
-      managerId: userToEdit.managerId || ''
+      manager_id: userToEdit.manager_id || ''
     });
     setIsDialogOpen(true);
   };
 
-  const handleSave = () => {
-    if (!formData.email || !formData.name || !formData.costCenter) {
+  const handleSave = async () => {
+    if (!formData.email || !formData.full_name) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields.",
@@ -82,37 +93,83 @@ export const Admin = () => {
       return;
     }
 
-    const newUser: User = {
-      id: formData.id,
-      email: formData.email,
-      name: formData.name,
-      role: formData.role,
-      costCenter: formData.costCenter,
-      managerId: formData.managerId || undefined
-    };
-
+    setLoading(true);
     try {
-      saveUser(newUser);
-      loadUsers(); // Reload users immediately after saving
+      if (editingProfile) {
+        // Update existing profile
+        await updateProfile(editingProfile.id, {
+          email: formData.email,
+          full_name: formData.full_name,
+          role: formData.role,
+          manager_id: formData.manager_id || null
+        });
+        toast({
+          title: "User updated",
+          description: `${formData.full_name} has been updated successfully.`,
+        });
+      } else {
+        // Create new user in Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: formData.email,
+          password: 'temp123!', // Temporary password
+          email_confirm: true,
+          user_metadata: {
+            full_name: formData.full_name
+          }
+        });
+
+        if (authError) {
+          throw authError;
+        }
+
+        if (authData.user) {
+          // Create profile (this should be handled by the trigger)
+          // But we'll update it with the manager info if needed
+          if (formData.manager_id) {
+            // Wait a moment for the trigger to create the profile
+            setTimeout(async () => {
+              try {
+                const { data: profiles } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('user_id', authData.user.id);
+                
+                if (profiles && profiles.length > 0) {
+                  await updateProfile(profiles[0].id, {
+                    role: formData.role,
+                    manager_id: formData.manager_id || null
+                  });
+                }
+              } catch (error) {
+                console.error('Error updating profile after creation:', error);
+              }
+            }, 1000);
+          }
+        }
+
+        toast({
+          title: "User created",
+          description: `${formData.full_name} has been created successfully with temporary password 'temp123!'.`,
+        });
+      }
+
+      await loadProfiles();
       setIsDialogOpen(false);
       resetForm();
-
-      toast({
-        title: editingUser ? "User updated" : "User created",
-        description: `${newUser.name} has been ${editingUser ? 'updated' : 'created'} successfully.`,
-      });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving user:', error);
       toast({
         title: "Error",
-        description: "Failed to save user. Please try again.",
+        description: error.message || "Failed to save user. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-
   };
 
-  const handleDelete = (userId: string) => {
-    if (userId === user?.id) {
+  const handleDelete = async (userProfile: Profile) => {
+    if (userProfile.id === profile?.id) {
       toast({
         title: "Cannot delete",
         description: "You cannot delete your own account.",
@@ -121,52 +178,56 @@ export const Admin = () => {
       return;
     }
 
-    if (confirm("Are you sure you want to delete this user?")) {
-      try {
-        deleteUser(userId);
-        loadUsers(); // Reload users immediately after deletion
-        toast({
-          title: "User deleted",
-          description: "User has been deleted successfully.",
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete user. Please try again.",
-          variant: "destructive",
-        });
+    if (!confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+
+    try {
+      // Delete user from Supabase Auth (this will cascade to profiles table)
+      const { error } = await supabase.auth.admin.deleteUser(userProfile.user_id);
+      
+      if (error) {
+        throw error;
       }
+
+      await loadProfiles();
+      toast({
+        title: "User deleted",
+        description: "User has been deleted successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const getManagerOptions = () => {
-    return users.filter(u => 
-      u.role === 'manager' || 
-      u.role === 'sales_manager' || 
-      u.role === 'general_manager'
+    return profiles.filter(u => 
+      u.role === 'manager' || u.role === 'procurement'
     );
   };
 
-  const getManagerName = (managerId?: string) => {
+  const getManagerName = (managerId?: string | null) => {
     if (!managerId) return 'None';
-    const manager = users.find(u => u.id === managerId);
-    return manager ? manager.name : 'Unknown';
+    const manager = profiles.find(u => u.id === managerId);
+    return manager ? manager.full_name : 'Unknown';
   };
 
   const getRoleBadgeVariant = (role: string) => {
     const variants = {
-      'requester': 'secondary',
-      'sales_requester': 'secondary',
+      'user': 'secondary',
       'manager': 'default',
-      'sales_manager': 'default',
-      'general_manager': 'destructive',
-      'controller': 'outline',
+      'admin': 'destructive',
       'procurement': 'outline'
     } as const;
     return variants[role as keyof typeof variants] || 'secondary';
   };
 
-  if (!user || !isAdmin(user.id)) return null;
+  if (!profile || profile.role !== 'admin') return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -188,7 +249,7 @@ export const Admin = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>{editingUser ? 'Edit User' : 'Create New User'}</DialogTitle>
+                <DialogTitle>{editingProfile ? 'Edit User' : 'Create New User'}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -198,15 +259,16 @@ export const Admin = () => {
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="col-span-3"
-                    placeholder="user@mz.sika.com"
+                    placeholder="user@company.com"
+                    disabled={!!editingProfile}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">Name*</Label>
                   <Input
                     id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    value={formData.full_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
                     className="col-span-3"
                     placeholder="Full Name"
                   />
@@ -215,37 +277,24 @@ export const Admin = () => {
                   <Label htmlFor="role" className="text-right">Role*</Label>
                   <Select 
                     value={formData.role} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as User['role'] }))}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as any }))}
                   >
                     <SelectTrigger className="col-span-3">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="requester">Requester</SelectItem>
-                      <SelectItem value="sales_requester">Sales Requester</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="sales_manager">Sales Manager</SelectItem>
-                      <SelectItem value="general_manager">General Manager</SelectItem>
-                      <SelectItem value="controller">Controller</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="procurement">Procurement</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="costCenter" className="text-right">Cost Center*</Label>
-                  <Input
-                    id="costCenter"
-                    value={formData.costCenter}
-                    onChange={(e) => setFormData(prev => ({ ...prev, costCenter: e.target.value }))}
-                    className="col-span-3"
-                    placeholder="CC001"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="manager" className="text-right">Manager</Label>
                   <Select 
-                    value={formData.managerId || "none"} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, managerId: value === "none" ? "" : value }))}
+                    value={formData.manager_id || "none"} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, manager_id: value === "none" ? "" : value }))}
                   >
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select manager (optional)" />
@@ -254,7 +303,7 @@ export const Admin = () => {
                       <SelectItem value="none">No Manager</SelectItem>
                       {getManagerOptions().map(manager => (
                         <SelectItem key={manager.id} value={manager.id}>
-                          {manager.name} ({manager.role.replace('_', ' ')})
+                          {manager.full_name} ({manager.role})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -265,8 +314,8 @@ export const Admin = () => {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSave}>
-                  {editingUser ? 'Update' : 'Create'}
+                <Button onClick={handleSave} disabled={loading}>
+                  {loading ? 'Saving...' : (editingProfile ? 'Update' : 'Create')}
                 </Button>
               </div>
             </DialogContent>
@@ -278,45 +327,44 @@ export const Admin = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Users className="h-5 w-5 mr-2" />
-              Users ({users.length})
+              Users ({profiles.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {users.map((userItem) => (
+              {profiles.map((userProfile) => (
                 <div 
-                  key={userItem.id} 
+                  key={userProfile.id} 
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
                 >
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="font-medium">{userItem.name}</h3>
-                      <Badge variant={getRoleBadgeVariant(userItem.role)}>
-                        {userItem.role.replace('_', ' ').toUpperCase()}
+                      <h3 className="font-medium">{userProfile.full_name}</h3>
+                      <Badge variant={getRoleBadgeVariant(userProfile.role)}>
+                        {userProfile.role.replace('_', ' ').toUpperCase()}
                       </Badge>
-                      {userItem.id === user.id && (
+                      {userProfile.id === profile.id && (
                         <Badge variant="outline" className="text-xs">YOU</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{userItem.email}</p>
+                    <p className="text-sm text-muted-foreground">{userProfile.email}</p>
                     <div className="flex items-center space-x-4 text-xs text-muted-foreground mt-1">
-                      <span>Cost Center: {userItem.costCenter}</span>
-                      <span>Manager: {getManagerName(userItem.managerId)}</span>
+                      <span>Manager: {getManagerName(userProfile.manager_id)}</span>
                     </div>
                   </div>
                   <div className="flex space-x-2">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => openEditDialog(userItem)}
+                      onClick={() => openEditDialog(userProfile)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
-                    {userItem.id !== user.id && (
+                    {userProfile.id !== profile.id && (
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => handleDelete(userItem.id)}
+                        onClick={() => handleDelete(userProfile)}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -1,22 +1,29 @@
 import { useState, useEffect } from "react";
-import { Plus, FileText, Clock, CheckCircle, Package, ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/components/AuthProvider";
-import { getShoppingRequests, type ShoppingRequestWithItems } from "@/lib/supabase";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ShoppingCart, Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle, Package } from "lucide-react";
 import { Header } from "@/components/Header";
+import { useAuth } from "@/components/AuthProvider";
+import { useToast } from "@/hooks/use-toast";
+import { getShoppingRequests, updateShoppingRequest } from "@/lib/supabase";
+import type { ShoppingRequestWithItems } from "@/lib/supabase";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { toast } = useToast();
   const [requests, setRequests] = useState<ShoppingRequestWithItems[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    loadRequests();
-  }, []);
+    if (profile) {
+      loadRequests();
+    }
+  }, [profile]);
 
   const loadRequests = async () => {
     try {
@@ -24,8 +31,35 @@ export const Dashboard = () => {
       setRequests(data);
     } catch (error) {
       console.error('Error loading requests:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load requests.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (requestId: string, newStatus: string, additionalData?: any) => {
+    try {
+      await updateShoppingRequest(requestId, { 
+        status: newStatus,
+        ...additionalData
+      });
+      
+      await loadRequests();
+      toast({
+        title: "Success",
+        description: "Request status updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error updating request:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update request status.",
+        variant: "destructive",
+      });
     }
   };
 
