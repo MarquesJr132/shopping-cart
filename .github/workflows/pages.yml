@@ -36,7 +36,12 @@ jobs:
 
       - name: Add SPA 404 fallback
         run: |
-          if [ -f dist/index.html ]; then cp dist/index.html dist/404.html; fi
+          if [ -f dist/index.html ]; then 
+            cp dist/index.html dist/404.html
+            echo "Adding SPA redirect configuration"
+            mkdir -p dist/.well-known
+            echo "/*    /index.html   200" > dist/_redirects
+          fi
 
       - name: Verify build output
         run: |
