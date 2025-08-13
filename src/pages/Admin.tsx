@@ -53,16 +53,26 @@ export const Admin = () => {
   const loadProfiles = async () => {
     try {
       console.log('Loading profiles...');
+      console.log('Supabase client:', supabase);
+      console.log('getAllProfiles function:', getAllProfiles);
+      
       const data = await getAllProfiles();
-      console.log('Profiles loaded:', data);
+      console.log('Profiles loaded successfully:', data);
       setProfiles(data);
     } catch (error) {
-      console.error('Error loading profiles:', error);
+      console.error('Error loading profiles - detailed:', error);
+      console.error('Error name:', error?.name);
+      console.error('Error message:', error?.message);
+      console.error('Error stack:', error?.stack);
+      
       toast({
         title: "Error",
-        description: "Failed to load users.",
+        description: `Failed to load users: ${error?.message || 'Unknown error'}`,
         variant: "destructive",
       });
+      
+      // Set empty array so the component still renders
+      setProfiles([]);
     }
   };
 
@@ -232,8 +242,11 @@ export const Admin = () => {
   };
 
   console.log('Admin render - profiles count:', profiles.length);
+  console.log('Current URL:', window.location.href);
+  console.log('Current pathname:', window.location.pathname);
   
   if (authLoading) {
+    console.log('Admin: Still loading auth...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -251,8 +264,8 @@ export const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div style={{backgroundColor: 'red', color: 'white', padding: '10px', textAlign: 'center'}}>
-        ADMIN PAGE IS LOADING - PROFILES COUNT: {profiles.length}
+      <div style={{backgroundColor: 'red', color: 'white', padding: '10px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold'}}>
+        🔧 DEBUG: ADMIN PAGE LOADING - PROFILES: {profiles.length} | URL: {window.location.pathname}
       </div>
       <Header />
       
