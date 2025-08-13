@@ -17,12 +17,12 @@ import type { Profile } from "@/lib/supabase";
 
 export const Admin = () => {
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [formData, setFormData] = useState<{
     email: string;
     full_name: string;
@@ -40,10 +40,13 @@ export const Admin = () => {
   });
 
   useEffect(() => {
+    console.log('Admin useEffect - profile:', profile);
     if (!profile || profile.role !== 'admin') {
+      console.log('Admin access denied - redirecting to dashboard');
       navigate('/dashboard');
       return;
     }
+    console.log('Admin access granted - loading profiles');
     loadProfiles();
   }, [profile, navigate]);
 
@@ -110,7 +113,7 @@ export const Admin = () => {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
     try {
       if (editingProfile) {
         // Update existing profile
@@ -163,7 +166,7 @@ export const Admin = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -226,7 +229,23 @@ export const Admin = () => {
     return variants[role as keyof typeof variants] || 'secondary';
   };
 
-  if (!profile || profile.role !== 'admin') return null;
+  console.log('Admin render - profile:', profile, 'loading:', authLoading);
+  
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile || profile.role !== 'admin') {
+    console.log('Admin: No profile or not admin, profile:', profile);
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -339,8 +358,8 @@ export const Admin = () => {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={loading}>
-                  {loading ? 'Saving...' : (editingProfile ? 'Update' : 'Create')}
+                <Button onClick={handleSave} disabled={formLoading}>
+                  {formLoading ? 'Saving...' : (editingProfile ? 'Update' : 'Create')}
                 </Button>
               </div>
             </DialogContent>
