@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/lib/supabase";
 
 export const Admin = () => {
+  console.log('🔥 ADMIN COMPONENT CALLED - START OF FUNCTION');
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
   const { toast } = useToast();

@@ -25,7 +25,11 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // Redirect admin users to admin dashboard only
-  if (profile.role === 'admin' && window.location.pathname !== '/admin') {
+  console.log('ProtectedRoute - profile:', profile);
+  console.log('ProtectedRoute - window.location.pathname:', window.location.pathname);
+  
+  if (profile.role === 'admin' && !window.location.pathname.endsWith('/admin')) {
+    console.log('ProtectedRoute - redirecting admin to /admin');
     return <Navigate to="/admin" replace />;
   }
   
