@@ -538,42 +538,42 @@ export const RequestDetail = () => {
 
             {/* Items Section */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="h-5 w-5 bg-gray-900 rounded-sm flex items-center justify-center">
+              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <div className="h-4 w-4 md:h-5 md:w-5 bg-gray-900 rounded-sm flex items-center justify-center">
                     <div className="h-2 w-2 bg-white rounded-sm"></div>
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900">Items ({request.request_items.length})</h2>
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">Items ({request.request_items.length})</h2>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="space-y-8">
+              <div className="p-4 md:p-6">
+                <div className="space-y-6 md:space-y-8">
                   {request.request_items.map((item, index) => (
-                    <div key={index} className={index !== request.request_items.length - 1 ? "pb-8 border-b border-gray-100" : ""}>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Item {index + 1}</h3>
-                      <div className="grid grid-cols-4 gap-6">
+                    <div key={index} className={index !== request.request_items.length - 1 ? "pb-6 md:pb-8 border-b border-gray-100" : ""}>
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Item {index + 1}</h3>
+                      <div className="space-y-3 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4 lg:gap-6">
                         <div className="space-y-1">
                           <div className="text-sm text-gray-500 font-medium">Code</div>
-                          <div className="text-base font-medium text-gray-900">{item.item_code}</div>
+                          <div className="text-sm md:text-base font-medium text-gray-900 break-all">{item.item_code}</div>
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-500 font-medium">Description</div>
-                          <div className="text-base font-medium text-gray-900">{item.description}</div>
+                          <div className="text-sm md:text-base font-medium text-gray-900">{item.description}</div>
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-500 font-medium">Quantity</div>
-                          <div className="text-base font-medium text-gray-900">{item.quantity} {item.unit}</div>
+                          <div className="text-sm md:text-base font-medium text-gray-900">{item.quantity} {item.unit}</div>
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-gray-500 font-medium">Type</div>
-                          <div className="text-base font-medium text-gray-900">{item.supplier || 'Standard'}</div>
+                          <div className="text-sm md:text-base font-medium text-gray-900">{item.supplier || 'Standard'}</div>
                         </div>
                       </div>
                       {item.notes && (
-                        <div className="mt-4 space-y-1">
+                        <div className="mt-3 md:mt-4 space-y-1">
                           <div className="text-sm text-gray-500 font-medium">Notes</div>
-                          <div className="text-base text-gray-700">{item.notes}</div>
+                          <div className="text-sm md:text-base text-gray-700">{item.notes}</div>
                         </div>
                       )}
                     </div>
@@ -581,8 +581,8 @@ export const RequestDetail = () => {
                 </div>
                 
                 {request.total_amount && request.total_amount > 0 && (
-                  <div className="border-t border-gray-100 pt-6 mt-8">
-                    <div className="text-xl font-semibold text-gray-900 text-right">
+                  <div className="border-t border-gray-100 pt-4 md:pt-6 mt-6 md:mt-8">
+                    <div className="text-lg md:text-xl font-semibold text-gray-900 text-right">
                       Total Amount: ${request.total_amount}
                     </div>
                   </div>
@@ -594,15 +594,15 @@ export const RequestDetail = () => {
 
           {/* Right Column - Timeline */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-8">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Timeline</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 lg:sticky lg:top-8">
+              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <Calendar className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">Timeline</h2>
                 </div>
               </div>
               
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 <div className="space-y-6">
                   {/* Requested */}
                   <div className="flex items-start space-x-4">
