@@ -19,60 +19,58 @@ export const Header = () => {
   return (
     <header className="bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
             <img 
               src={sikaLogo} 
               alt="Sika Mozambique" 
-              className="h-12 w-auto bg-white p-2 rounded"
+              className="h-8 w-auto md:h-12 bg-white p-1 md:p-2 rounded flex-shrink-0"
             />
-            <div>
-              <h1 className="text-xl font-bold">Internal Shopping cart</h1>
-              <p className="text-primary-foreground/80 text-sm">Sika Mozambique</p>
+            <div className="min-w-0">
+              <h1 className="text-sm md:text-xl font-bold truncate">Internal Shopping cart</h1>
+              <p className="text-primary-foreground/80 text-xs md:text-sm truncate">Sika Mozambique</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/dashboard')}
-              className="hidden md:flex bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+              className="hidden sm:flex bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
             >
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
+              <Home className="h-4 w-4 mr-1" />
+              <span className="hidden lg:inline">Dashboard</span>
             </Button>
             
-
             {profile.role === 'admin' && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/admin')}
-                className="hidden md:flex bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+                className="hidden sm:flex bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Admin
+                <Settings className="h-4 w-4 mr-1" />
+                <span className="hidden lg:inline">Admin</span>
               </Button>
             )}
 
-            
-
-            <div className="flex items-center space-x-2">
+            <div className="hidden md:flex items-center space-x-2">
               <User className="h-4 w-4" />
-              <span className="text-sm">{profile.full_name}</span>
-              <span className="text-xs bg-primary-foreground/20 px-2 py-1 rounded">
+              <span className="text-sm truncate max-w-24">{profile.full_name}</span>
+              <span className="text-xs bg-primary-foreground/20 px-2 py-1 rounded whitespace-nowrap">
                 {profile.role.replace('_', ' ').toUpperCase()}
               </span>
             </div>
+            
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleLogout}
               className="bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              <LogOut className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Logout</span>
             </Button>
           </div>
         </div>
