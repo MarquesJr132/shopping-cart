@@ -31,10 +31,9 @@ jobs:
 
       - name: Build
         run: npm run build
-        # If you use envs (e.g., Supabase), add them as repo Secrets and uncomment:
-        # env:
-        #   VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-        #   VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: SPA 404 fallback (only if index exists)
         run: |

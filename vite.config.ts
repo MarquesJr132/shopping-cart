@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: './',
+  base: mode === 'production' ? '/sika-stock-flow-94/' : './',
   server: {
     host: "::",
     port: 8080,
