@@ -12,6 +12,7 @@ interface CreateUserRequest {
   role: 'user' | 'manager' | 'admin' | 'procurement'
   manager_id?: string
   cost_center?: string
+  position?: string
 }
 
 Deno.serve(async (req) => {
@@ -32,7 +33,7 @@ Deno.serve(async (req) => {
       }
     )
 
-    const { email, password, full_name, role, manager_id, cost_center }: CreateUserRequest = await req.json()
+    const { email, password, full_name, role, manager_id, cost_center, position }: CreateUserRequest = await req.json()
 
     console.log('Creating user:', { email, full_name, role })
 
@@ -60,7 +61,8 @@ Deno.serve(async (req) => {
         .update({
           role,
           manager_id: manager_id || null,
-          cost_center: cost_center || null
+          cost_center: cost_center || null,
+          position: position || null
         })
         .eq('user_id', userData.user.id)
 

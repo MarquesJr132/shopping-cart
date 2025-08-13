@@ -246,14 +246,17 @@ export const RequestDetail = () => {
     doc.text('Requested By:', leftColumnX + 2, sectionY + 15);
     doc.text(request.requester.full_name, leftColumnX + 35, sectionY + 15);
     
-    doc.text('Cost Center:', leftColumnX + 2, sectionY + 22);
-    doc.text(request.requester.cost_center || 'Not assigned', leftColumnX + 35, sectionY + 22);
+    doc.text('Position:', leftColumnX + 2, sectionY + 22);
+    doc.text(request.requester.position || 'Not assigned', leftColumnX + 35, sectionY + 22);
     
-    doc.text('Request Date:', leftColumnX + 2, sectionY + 29);
-    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT'), leftColumnX + 35, sectionY + 29);
+    doc.text('Cost Center:', leftColumnX + 2, sectionY + 29);
+    doc.text(request.requester.cost_center || 'Not assigned', leftColumnX + 35, sectionY + 29);
     
-    doc.text('Description/Reason:', leftColumnX + 2, sectionY + 36);
-    doc.text(request.justification || 'out of tonner', leftColumnX + 35, sectionY + 36);
+    doc.text('Request Date:', leftColumnX + 2, sectionY + 36);
+    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT'), leftColumnX + 35, sectionY + 36);
+    
+    doc.text('Description/Reason:', leftColumnX + 2, sectionY + 43);
+    doc.text(request.justification || 'out of tonner', leftColumnX + 35, sectionY + 43);
     
     // Movement Details Section (right column)
     doc.setFillColor(240, 240, 240);
@@ -317,33 +320,33 @@ export const RequestDetail = () => {
     
     yPos += 18;
     
-    // Step 1: Requested By
+    // Step 1: Requested By (more compact)
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('1. REQUESTED BY', 25, yPos);
     doc.text('•  S u b m i t t e d', 150, yPos);
     
-    yPos += 8;
-    doc.setFont('helvetica', 'normal');
-    doc.text(request.requester.full_name, 25, yPos);
     yPos += 6;
-    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT') + ' at ' + new Date(request.created_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 25, yPos);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${request.requester.full_name} (${request.requester.position || 'Position not set'})`, 25, yPos);
+    yPos += 4;
+    doc.text(new Date(request.created_at).toLocaleDateString('pt-PT'), 25, yPos);
     
-    // Step 2: Manager Approval
-    yPos += 15;
+    // Step 2: Manager Approval (more compact)
+    yPos += 10;
     doc.setFont('helvetica', 'bold');
     doc.text('2. MANAGER APPROVAL', 25, yPos);
     
     if (request.manager_approval && request.manager_approved_at) {
       doc.text('•  A p p r o v e d', 150, yPos);
-      yPos += 8;
-      doc.setFont('helvetica', 'normal');
-      doc.text(request.manager_approval.full_name, 25, yPos);
       yPos += 6;
-      doc.text(new Date(request.manager_approved_at).toLocaleDateString('pt-PT') + ' at ' + new Date(request.manager_approved_at).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 25, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${request.manager_approval.full_name} (${request.manager_approval.position || 'Position not set'})`, 25, yPos);
+      yPos += 4;
+      doc.text(new Date(request.manager_approved_at).toLocaleDateString('pt-PT'), 25, yPos);
     } else {
       doc.text('•  P e n d i n g', 150, yPos);
-      yPos += 8;
+      yPos += 6;
       doc.setFont('helvetica', 'normal');
       doc.text('Awaiting manager approval', 25, yPos);
     }
