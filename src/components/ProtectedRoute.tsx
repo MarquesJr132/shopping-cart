@@ -1,14 +1,14 @@
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+
 import { useAuth } from "./AuthProvider";
+import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, profile, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -19,17 +19,17 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       </div>
     );
   }
-  
-  if (!user || !profile) {
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!profile) {
     return <Navigate to="/auth" replace />;
   }
 
   // Redirect admin users to admin dashboard only
-  console.log('ProtectedRoute - profile:', profile);
-  console.log('ProtectedRoute - window.location.pathname:', window.location.pathname);
-  
   if (profile.role === 'admin' && !window.location.pathname.endsWith('/admin')) {
-    console.log('ProtectedRoute - redirecting admin to /admin');
     return <Navigate to="/admin" replace />;
   }
   

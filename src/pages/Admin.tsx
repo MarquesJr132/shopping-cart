@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/lib/supabase";
 
 export const Admin = () => {
-  console.log('🔥 ADMIN COMPONENT CALLED - START OF FUNCTION');
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -31,48 +31,36 @@ export const Admin = () => {
     role: 'user' | 'manager' | 'admin' | 'procurement';
     manager_id: string;
     cost_center: string;
+    position: string;
   }>({
     email: '',
     full_name: '',
     password: '',
     role: 'user',
     manager_id: '',
-    cost_center: ''
+    cost_center: '',
+    position: ''
   });
 
   useEffect(() => {
-    console.log('Admin useEffect - profile:', profile);
     if (!profile || profile.role !== 'admin') {
-      console.log('Admin access denied - redirecting to dashboard');
       navigate('/dashboard');
       return;
     }
-    console.log('Admin access granted - loading profiles');
     loadProfiles();
   }, [profile, navigate]);
 
   const loadProfiles = async () => {
     try {
-      console.log('Loading profiles...');
-      console.log('Supabase client:', supabase);
-      console.log('getAllProfiles function:', getAllProfiles);
-      
       const data = await getAllProfiles();
-      console.log('Profiles loaded successfully:', data);
       setProfiles(data);
     } catch (error) {
-      console.error('Error loading profiles - detailed:', error);
-      console.error('Error name:', error?.name);
-      console.error('Error message:', error?.message);
-      console.error('Error stack:', error?.stack);
-      
+      console.error('Error loading profiles:', error);
       toast({
         title: "Error",
         description: `Failed to load users: ${error?.message || 'Unknown error'}`,
         variant: "destructive",
       });
-      
-      // Set empty array so the component still renders
       setProfiles([]);
     }
   };
@@ -84,7 +72,8 @@ export const Admin = () => {
       password: '',
       role: 'user',
       manager_id: '',
-      cost_center: ''
+      cost_center: '',
+      position: ''
     });
     setEditingProfile(null);
   };
@@ -102,7 +91,8 @@ export const Admin = () => {
       password: '', // Don't pre-fill password for security
       role: userToEdit.role,
       manager_id: userToEdit.manager_id || '',
-      cost_center: userToEdit.cost_center || ''
+      cost_center: userToEdit.cost_center || '',
+      position: userToEdit.position || ''
     });
     setIsDialogOpen(true);
   };
@@ -135,7 +125,8 @@ export const Admin = () => {
           full_name: formData.full_name,
           role: formData.role,
           manager_id: formData.manager_id || null,
-          cost_center: formData.cost_center || null
+          cost_center: formData.cost_center || null,
+          position: formData.position || null
         });
         toast({
           title: "User updated",
@@ -150,7 +141,8 @@ export const Admin = () => {
             full_name: formData.full_name,
             role: formData.role,
             manager_id: formData.manager_id || undefined,
-            cost_center: formData.cost_center || undefined
+            cost_center: formData.cost_center || undefined,
+            position: formData.position || undefined
           }
         })
 
@@ -242,12 +234,7 @@ export const Admin = () => {
     return variants[role as keyof typeof variants] || 'secondary';
   };
 
-  console.log('Admin render - profiles count:', profiles.length);
-  console.log('Current URL:', window.location.href);
-  console.log('Current pathname:', window.location.pathname);
-  
   if (authLoading) {
-    console.log('Admin: Still loading auth...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -259,15 +246,11 @@ export const Admin = () => {
   }
 
   if (!profile || profile.role !== 'admin') {
-    console.log('Admin: No profile or not admin, profile:', profile);
     return null;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <div style={{backgroundColor: 'red', color: 'white', padding: '10px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold'}}>
-        🔧 DEBUG: ADMIN PAGE LOADING - PROFILES: {profiles.length} | URL: {window.location.pathname}
-      </div>
       <Header />
       
       <div className="container mx-auto px-4 py-6">
@@ -311,6 +294,16 @@ export const Admin = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
                     className="col-span-3"
                     placeholder="Full Name"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="position" className="text-right">Position</Label>
+                  <Input
+                    id="position"
+                    value={formData.position}
+                    onChange={(e) => setFormData(prev => ({ ...prev, position: e.target.value }))}
+                    className="col-span-3"
+                    placeholder="Job title/position"
                   />
                 </div>
                 {!editingProfile && (
@@ -412,6 +405,7 @@ export const Admin = () => {
                     </div>
                     <p className="text-sm text-muted-foreground">{userProfile.email}</p>
                     <div className="flex items-center space-x-4 text-xs text-muted-foreground mt-1">
+                      <span>Position: {userProfile.position || 'Not assigned'}</span>
                       <span>Manager: {getManagerName(userProfile.manager_id)}</span>
                       <span>Cost Center: {userProfile.cost_center || 'Not assigned'}</span>
                     </div>
