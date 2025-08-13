@@ -30,9 +30,9 @@ jobs:
       - name: Build
         run: npm run build
         # If you need env vars (e.g., Supabase), uncomment and add repo Secrets:
-        # env:
-        #   VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-        #   VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        env:
+          VITE_SUPABASE_URL: 'https://dwlyjmgksmehgmpehzvj.supabase.co'
+          VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3bHlqbWdrc21laGdtcGVoenZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMjIzMzUsImV4cCI6MjA3MDU5ODMzNX0.oc5rkUBJfAJshr-fLx-tZ8WHLuTCXmmacnPWv-tn1pg'
 
       - name: Add SPA 404 fallback
         run: |
