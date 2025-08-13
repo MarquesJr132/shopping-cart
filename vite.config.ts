@@ -1,16 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-
-// Conditionally import lovable-tagger only in development environment
-let componentTagger: any = null;
-try {
-  if (process.env.NODE_ENV === 'development') {
-    componentTagger = require("lovable-tagger").componentTagger;
-  }
-} catch (e) {
-  // lovable-tagger not available, continue without it
-}
+import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -21,7 +12,8 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    componentTagger && mode === 'development' && componentTagger(),
+    mode === 'development' &&
+    componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
