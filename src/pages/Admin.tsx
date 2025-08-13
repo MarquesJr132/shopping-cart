@@ -52,7 +52,9 @@ export const Admin = () => {
 
   const loadProfiles = async () => {
     try {
+      console.log('Loading profiles...');
       const data = await getAllProfiles();
+      console.log('Profiles loaded:', data);
       setProfiles(data);
     } catch (error) {
       console.error('Error loading profiles:', error);
@@ -229,7 +231,7 @@ export const Admin = () => {
     return variants[role as keyof typeof variants] || 'secondary';
   };
 
-  console.log('Admin render - profile:', profile, 'loading:', authLoading);
+  console.log('Admin render - profiles count:', profiles.length);
   
   if (authLoading) {
     return (
@@ -249,6 +251,9 @@ export const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <div style={{backgroundColor: 'red', color: 'white', padding: '10px', textAlign: 'center'}}>
+        ADMIN PAGE IS LOADING - PROFILES COUNT: {profiles.length}
+      </div>
       <Header />
       
       <div className="container mx-auto px-4 py-6">
