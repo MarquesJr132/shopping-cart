@@ -426,24 +426,25 @@ export const RequestDetail = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-8 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-4 md:px-8 md:py-8 max-w-7xl">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
-          <div className="flex items-center space-x-6">
-            <h1 className="text-4xl font-bold text-gray-900">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 pb-4 md:pb-6 border-b border-gray-200 space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
               {request.request_number}
             </h1>
             {getStatusBadge(request.status)}
-            <span className="text-gray-600 text-lg">
+            <span className="text-gray-600 text-sm md:text-lg">
               Created on {new Date(request.created_at).toLocaleDateString()}
             </span>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
             {canEdit && (
               <Button 
                 onClick={() => navigate(`/request/edit/${request.id}`)}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
+                size="sm"
               >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -454,39 +455,42 @@ export const RequestDetail = () => {
                 variant="outline" 
                 onClick={generatePDF}
                 className="border-gray-300 hover:bg-gray-50"
+                size="sm"
               >
                 <FileText className="h-4 w-4 mr-2" />
-                Generate PDF
+                <span className="hidden sm:inline">Generate </span>PDF
               </Button>
             )}
             <Button 
               variant="ghost" 
               onClick={() => navigate('/dashboard')}
-              className="text-gray-600 hover:text-gray-900 text-lg font-medium"
+              className="text-gray-600 hover:text-gray-900 text-sm md:text-lg font-medium"
+              size="sm"
             >
-              Back to Dashboard
+              <ArrowLeft className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Back to </span>Dashboard
             </Button>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-8">
           {/* Left Column - General Information & Items */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className="lg:col-span-3 space-y-4 md:space-y-8">
             {/* General Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <FileText className="h-5 w-5 text-gray-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">General Information</h2>
+              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-gray-100">
+                <div className="flex items-center space-x-2 md:space-x-3">
+                  <FileText className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900">General Information</h2>
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="grid grid-cols-2 gap-8">
+              <div className="p-4 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                   <div className="space-y-1">
                     <div className="text-sm text-gray-500 font-medium">Journal Name</div>
-                    <div className="text-lg font-medium text-gray-900">{request.request_type}</div>
+                    <div className="text-base md:text-lg font-medium text-gray-900">{request.request_type}</div>
                   </div>
                   
                   <div className="space-y-1">
