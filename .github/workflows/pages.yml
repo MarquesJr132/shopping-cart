@@ -64,3 +64,8 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+      
+      - name: Display deployment URL
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "Your app is now available at: https://marquesjr132.github.io/sika-stock-flow-94/"
