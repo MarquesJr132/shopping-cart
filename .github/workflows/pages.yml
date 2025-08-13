@@ -17,29 +17,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Build
         run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        # If you need env vars (e.g., Supabase), uncomment and add repo Secrets:
+        # env:
+        #   VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        #   VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: SPA 404 fallback (only if index exists)
+      - name: Add SPA 404 fallback
         run: |
-          if [ -f dist/index.html ]; then
-            cp dist/index.html dist/404.html
-          fi
+          if [ -f dist/index.html ]; then cp dist/index.html dist/404.html; fi
+
+      - name: Verify build output
+        run: |
+          echo "Listing dist/"
+          ls -la dist
+          test -f dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -49,9 +52,10 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       - id: deployment
         uses: actions/deploy-pages@v4
