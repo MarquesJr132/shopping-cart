@@ -22,7 +22,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename={import.meta.env.PROD ? "/sika-stock-flow-94" : ""}>
+        <BrowserRouter basename={import.meta.env.PROD ? "/shopping-cart" : ""}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
