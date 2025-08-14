@@ -681,7 +681,7 @@ export const RequestDetail = () => {
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-gray-900">Final Approval</div>
                         <div className="text-sm text-gray-600">
-                          by Finance Controller
+                          by {request.manager_approval?.position || request.manager_approval?.full_name || 'Manager'}
                         </div>
                         <div className="text-sm text-gray-500">
                           {new Date(request.manager_approved_at || request.created_at).toLocaleDateString()}, {new Date(request.manager_approved_at || request.created_at).toLocaleTimeString('en-US', { 
