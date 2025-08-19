@@ -517,12 +517,6 @@ export const RequestDetail = () => {
                     </div>
                   )}
                   
-                  {request.client_name && (
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-500 font-medium">Client Name</div>
-                      <div className="text-lg font-medium text-gray-900">{request.client_name}</div>
-                    </div>
-                  )}
                 </div>
                 
                 {request.justification && (

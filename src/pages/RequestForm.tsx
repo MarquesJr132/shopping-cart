@@ -40,8 +40,6 @@ export const RequestForm = () => {
     request_type: searchParams.get('type') || 'material',
     delivery_date: '',
     preferred_supplier: '',
-    client_name: '',
-    client_id: '',
     justification: ''
   });
 
@@ -60,8 +58,6 @@ export const RequestForm = () => {
         request_type: request.request_type,
         delivery_date: request.delivery_date || '',
         preferred_supplier: request.preferred_supplier || '',
-        client_name: request.client_name || '',
-        client_id: request.client_id || '',
         justification: request.justification || ''
       });
       
@@ -121,8 +117,6 @@ export const RequestForm = () => {
         request_type: formData.request_type,
         delivery_date: formData.delivery_date || null,
         preferred_supplier: formData.preferred_supplier || null,
-        client_name: formData.client_name || null,
-        client_id: formData.client_id || null,
         justification: formData.justification || null,
         total_amount: calculateTotal(),
         status: 'draft' as const
@@ -184,8 +178,6 @@ export const RequestForm = () => {
         request_type: formData.request_type,
         delivery_date: formData.delivery_date || null,
         preferred_supplier: formData.preferred_supplier || null,
-        client_name: formData.client_name || null,
-        client_id: formData.client_id || null,
         justification: formData.justification || null,
         total_amount: calculateTotal(),
         status: 'pending_approval' as const,
@@ -301,25 +293,6 @@ export const RequestForm = () => {
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="client_name">Client Name</Label>
-                      <Input
-                        id="client_name"
-                        value={formData.client_name}
-                        onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
-                        placeholder="Optional"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="client_id">Client ID</Label>
-                      <Input
-                        id="client_id"
-                        value={formData.client_id}
-                        onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                        placeholder="Optional"
-                      />
-                    </div>
                   </div>
 
                   <div className="space-y-2">
