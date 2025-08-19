@@ -111,6 +111,21 @@ export type Database = {
           },
         ]
       }
+      request_number_counters: {
+        Row: {
+          last_number: number
+          year: string
+        }
+        Insert: {
+          last_number?: number
+          year: string
+        }
+        Update: {
+          last_number?: number
+          year?: string
+        }
+        Relationships: []
+      }
       shopping_cart_items: {
         Row: {
           created_at: string
