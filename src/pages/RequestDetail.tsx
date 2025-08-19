@@ -268,10 +268,10 @@ export const RequestDetail = () => {
     
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text('Journal Number:', rightColumnX + 2, sectionY + 15);
+    doc.text('Request Number:', rightColumnX + 2, sectionY + 15);
     doc.text(request.request_number, rightColumnX + 35, sectionY + 15);
     
-    doc.text('Journal Name:', rightColumnX + 2, sectionY + 22);
+    doc.text('Request Name:', rightColumnX + 2, sectionY + 22);
     doc.text('Shopping Card', rightColumnX + 35, sectionY + 22);
     
     doc.text('Request Type:', rightColumnX + 2, sectionY + 29);
@@ -489,7 +489,7 @@ export const RequestDetail = () => {
               <div className="p-4 md:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                   <div className="space-y-1">
-                    <div className="text-sm text-gray-500 font-medium">Journal Name</div>
+                    <div className="text-sm text-gray-500 font-medium">Request Name</div>
                     <div className="text-base md:text-lg font-medium text-gray-900">{request.request_type}</div>
                   </div>
                   
