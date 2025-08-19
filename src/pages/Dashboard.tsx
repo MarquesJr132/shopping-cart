@@ -256,11 +256,18 @@ export const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Filters Section */}
-        <Card className="mb-6">
-          <CardHeader className="pb-3">
+        {/* Recent Requests */}
+        <Card>
+          <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Filters & Search</CardTitle>
+              <div>
+                <CardTitle>
+                  {hasActiveFilters() ? 'Filtered Requests' : 'Recent Requests'}
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    ({filteredRequests.length} total)
+                  </span>
+                </CardTitle>
+              </div>
               <div className="flex items-center space-x-2">
                 {hasActiveFilters() && (
                   <Button
@@ -283,192 +290,181 @@ export const Dashboard = () => {
                 </Button>
               </div>
             </div>
-          </CardHeader>
-          
-          {showFilters && (
-            <CardContent className="space-y-4">
-              {/* Search Bar */}
-              <div className="space-y-2">
-                <Label htmlFor="search">Search</Label>
-                <Input
-                  id="search"
-                  placeholder="Search by request number, description, or requester..."
-                  value={filters.searchQuery}
-                  onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-                />
+            
+            {/* Filters Section - Now integrated into the main card */}
+            {showFilters && (
+              <div className="mt-4 pt-4 border-t space-y-4">
+                {/* Search Bar */}
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search</Label>
+                  <Input
+                    id="search"
+                    placeholder="Search by request number, description, or requester..."
+                    value={filters.searchQuery}
+                    onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {/* Status Filter */}
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select
+                      value={filters.status}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Request Type Filter */}
+                  <div className="space-y-2">
+                    <Label>Request Type</Label>
+                    <Select
+                      value={filters.requestType}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, requestType: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="material">Material</SelectItem>
+                        <SelectItem value="service">Service</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Requester Filter */}
+                  <div className="space-y-2">
+                    <Label>Requester</Label>
+                    <Select
+                      value={filters.requester}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, requester: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Requesters</SelectItem>
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile.id} value={profile.id}>
+                            {profile.full_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Date From Filter */}
+                  <div className="space-y-2">
+                    <Label>From Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !filters.dateFrom && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateFrom ? format(filters.dateFrom, "MMM dd, yyyy") : "Pick date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={filters.dateFrom}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: date }))}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  {/* Date To Filter */}
+                  <div className="space-y-2">
+                    <Label>To Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !filters.dateTo && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateTo ? format(filters.dateTo, "MMM dd, yyyy") : "Pick date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={filters.dateTo}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: date }))}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                {/* Active Filters Summary */}
+                {hasActiveFilters() && (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t">
+                    <span className="text-sm text-muted-foreground">Active filters:</span>
+                    {filters.status !== 'all' && (
+                      <Badge variant="secondary" className="text-xs">
+                        Status: {filters.status}
+                      </Badge>
+                    )}
+                    {filters.requestType !== 'all' && (
+                      <Badge variant="secondary" className="text-xs">
+                        Type: {filters.requestType}
+                      </Badge>
+                    )}
+                    {filters.requester !== 'all' && (
+                      <Badge variant="secondary" className="text-xs">
+                        Requester: {profiles.find(p => p.id === filters.requester)?.full_name}
+                      </Badge>
+                    )}
+                    {filters.dateFrom && (
+                      <Badge variant="secondary" className="text-xs">
+                        From: {format(filters.dateFrom, "MMM dd, yyyy")}
+                      </Badge>
+                    )}
+                    {filters.dateTo && (
+                      <Badge variant="secondary" className="text-xs">
+                        To: {format(filters.dateTo, "MMM dd, yyyy")}
+                      </Badge>
+                    )}
+                    {filters.searchQuery.trim() && (
+                      <Badge variant="secondary" className="text-xs">
+                        Search: "{filters.searchQuery}"
+                      </Badge>
+                    )}
+                    <span className="text-sm text-muted-foreground">
+                      ({filteredRequests.length} of {requests.length} requests)
+                    </span>
+                  </div>
+                )}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {/* Status Filter */}
-                <div className="space-y-2">
-                  <Label>Status</Label>
-                  <Select
-                    value={filters.status}
-                    onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="pending_approval">Pending Approval</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Request Type Filter */}
-                <div className="space-y-2">
-                  <Label>Request Type</Label>
-                  <Select
-                    value={filters.requestType}
-                    onValueChange={(value) => setFilters(prev => ({ ...prev, requestType: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="material">Material</SelectItem>
-                      <SelectItem value="service">Service</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Requester Filter */}
-                <div className="space-y-2">
-                  <Label>Requester</Label>
-                  <Select
-                    value={filters.requester}
-                    onValueChange={(value) => setFilters(prev => ({ ...prev, requester: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Requesters</SelectItem>
-                      {profiles.map((profile) => (
-                        <SelectItem key={profile.id} value={profile.id}>
-                          {profile.full_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Date From Filter */}
-                <div className="space-y-2">
-                  <Label>From Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !filters.dateFrom && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dateFrom ? format(filters.dateFrom, "MMM dd, yyyy") : "Pick date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={filters.dateFrom}
-                        onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: date }))}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                {/* Date To Filter */}
-                <div className="space-y-2">
-                  <Label>To Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !filters.dateTo && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dateTo ? format(filters.dateTo, "MMM dd, yyyy") : "Pick date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={filters.dateTo}
-                        onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: date }))}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-
-              {/* Active Filters Summary */}
-              {hasActiveFilters() && (
-                <div className="flex flex-wrap gap-2 pt-2 border-t">
-                  <span className="text-sm text-muted-foreground">Active filters:</span>
-                  {filters.status !== 'all' && (
-                    <Badge variant="secondary" className="text-xs">
-                      Status: {filters.status}
-                    </Badge>
-                  )}
-                  {filters.requestType !== 'all' && (
-                    <Badge variant="secondary" className="text-xs">
-                      Type: {filters.requestType}
-                    </Badge>
-                  )}
-                  {filters.requester !== 'all' && (
-                    <Badge variant="secondary" className="text-xs">
-                      Requester: {profiles.find(p => p.id === filters.requester)?.full_name}
-                    </Badge>
-                  )}
-                  {filters.dateFrom && (
-                    <Badge variant="secondary" className="text-xs">
-                      From: {format(filters.dateFrom, "MMM dd, yyyy")}
-                    </Badge>
-                  )}
-                  {filters.dateTo && (
-                    <Badge variant="secondary" className="text-xs">
-                      To: {format(filters.dateTo, "MMM dd, yyyy")}
-                    </Badge>
-                  )}
-                  {filters.searchQuery.trim() && (
-                    <Badge variant="secondary" className="text-xs">
-                      Search: "{filters.searchQuery}"
-                    </Badge>
-                  )}
-                  <span className="text-sm text-muted-foreground">
-                    ({filteredRequests.length} of {requests.length} requests)
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          )}
-        </Card>
-
-        {/* Recent Requests */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {hasActiveFilters() ? 'Filtered Requests' : 'Recent Requests'}
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                ({filteredRequests.length} total)
-              </span>
-            </CardTitle>
+            )}
           </CardHeader>
           <CardContent>
             {loading ? (
