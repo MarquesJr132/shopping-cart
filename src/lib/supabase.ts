@@ -41,7 +41,12 @@ export const getProfile = async (userId?: string) => {
 
 // Shopping requests helpers
 export const createShoppingRequest = async (request: Partial<ShoppingRequest> & { requester_id: string; request_type: string; status: string }) => {
-  const { data: requestNumber } = await supabase.rpc('generate_request_number');
+  const { data: requestNumber, error: rpcError } = await supabase.rpc('generate_request_number');
+  
+  if (rpcError || !requestNumber) {
+    console.error('Error generating request number:', rpcError);
+    throw new Error('Failed to generate request number');
+  }
   
   const { data, error } = await supabase
     .from('shopping_requests')
